@@ -40,7 +40,7 @@ export default registerAs('logger', () => {
     categories: {
       default: {
         appenders: ['console', 'appLogFilter', 'errors'],
-        level: 'debug',
+        level: process.env.LOG_LEVEL || 'info',
       },
       http: { appenders: ['access'], level: 'info' },
     },
