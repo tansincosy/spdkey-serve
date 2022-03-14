@@ -4,12 +4,22 @@ import { Configuration } from 'log4js';
 export default registerAs('logger', () => {
   const logConfig: Configuration = {
     appenders: {
-      console: { type: 'console' },
+      console: {
+        type: 'console',
+        layout: {
+          type: 'pattern',
+          pattern: '%[[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] %c -%] %m',
+        },
+      },
       access: {
         type: 'dateFile',
         filename: 'logs/access.log',
         pattern: '-yyyy-MM-dd',
         category: 'http',
+        layout: {
+          type: 'pattern',
+          pattern: '[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] [%c] - %m',
+        },
       },
       appLog: {
         type: 'dateFile',
@@ -17,6 +27,10 @@ export default registerAs('logger', () => {
         pattern: '-yyyy-MM-dd',
         keepFileExt: true,
         compress: true,
+        layout: {
+          type: 'pattern',
+          pattern: '[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] [%c] - %m',
+        },
       },
       appLogFilter: {
         type: 'categoryFilter',
@@ -30,6 +44,10 @@ export default registerAs('logger', () => {
         pattern: 'yyyy-MM-dd',
         keepFileExt: true,
         compress: true,
+        layout: {
+          type: 'pattern',
+          pattern: '[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] [%c] - %m',
+        },
       },
       errors: {
         type: 'logLevelFilter',
