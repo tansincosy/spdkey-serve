@@ -1,0 +1,3 @@
+class DeviceService {
+  constructor(parameters) {}
+}

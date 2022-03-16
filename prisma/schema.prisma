@@ -10,11 +10,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Test {
-  id        String   @id @default(uuid())
-  updatedAt DateTime @default(now()) @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  username  String?  @unique @default("")
+// scope 表
+model Scope {
+  id        String        @id @default(uuid())
+  updatedAt DateTime      @default(now()) @map("updated_at")
+  createdAt DateTime      @default(now()) @map("created_at")
+  name      String?
+  users     ScopeOnUser[]
 
-  @@map("tb_dk_test")
+  @@map("zap_tb_scope")
+}
+
+model ScopeOnUser {
+  createdAt DateTime @default(now()) @map("created_at")
+  scope     Scope?   @relation(fields: [scopeId], references: [id])
+  scopeId   String   @map("scope_id")
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String   @map("user_id")
+
+  @@id([scopeId, userId])
+  @@map("zap_link_scope_on_user")
+}
+
+//用户表
+model User {
+  id          String         @id @default(uuid())
+  updatedAt   DateTime       @default(now()) @map("updated_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  username    String?        @unique @default("")
+  password    String?        @default("")
+  isLocked    Int?           @default(0) @map("is_locked")
+  scopes      ScopeOnUser[]
+  devices     UserOnDevice[]
+  deviceLimit Int?           @default(5) @map("device_limit")
+
+  Device Device[]
+  @@map("zap_tb_user")
+}
+
+model UserOnDevice {
+  createdAt DateTime @default(now()) @map("created_at")
+  userId    String   @map("user_id")
+  deviceId  String   @map("device_id")
+
+  User   User   @relation(fields: [userId], references: [id])
+  Device Device @relation(fields: [deviceId], references: [id])
+  @@id([userId, deviceId])
+  @@map("zap_link_user_on_device")
+}
+
+model Grant {
+  id        String          @id @default(uuid())
+  updatedAt DateTime        @default(now()) @map("updated_at")
+  createdAt DateTime        @default(now()) @map("created_at")
+  name      String?         @unique @default("")
+  device    GrantOnDevice[]
+
+  @@map("zap_tb_grant")
+}
+
+model GrantOnDevice {
+  createdAt DateTime @default(now()) @map("created_at")
+  grant     Grant?   @relation(fields: [grantId], references: [id])
+  grantId   String   @map("grant_id")
+  device    Device?  @relation(fields: [deviceId], references: [id])
+  deviceId  String   @map("device_id")
+
+  @@id([grantId, deviceId])
+  @@map("zap_link_grant_on_device")
+}
+
+model Device {
+  id                          String          @id @default(uuid())
+  updatedAt                   DateTime        @default(now()) @map("updated_at")
+  createdAt                   DateTime        @default(now()) @map("created_at")
+  name                        String?         @default("")
+  type                        String?         @default("")
+  engine                      String?         @default("")
+  os                          String?         @default("")
+  deviceId                    String?         @default("") @map("device_id")
+  deviceSecret                String?         @default("") @map("device_secret")
+  isLocked                    Int?            @default(0) @map("is_locked")
+  accessTokenValidateSeconds  Int             @default(1800) @map("access_token_validate_seconds")
+  refreshTokenValidateSeconds Int             @default(604800) @map("refresh_token_validate_seconds")
+  users                       UserOnDevice[]
+  isOnline                    Int?            @default(0) @map("is_online") @db.TinyInt
+  grants                      GrantOnDevice[]
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+  @@map("zap_tb_device")
 }
