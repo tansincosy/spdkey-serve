@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
 import { Log4JService } from '@/common';
@@ -30,4 +29,6 @@ export class UserDao {
     });
     return user;
   }
+
+  async userRegister() {}
 }

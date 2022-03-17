@@ -1,22 +1,19 @@
-import { Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Log4JService } from '@/common';
+import { Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-/**
- * notice:
- * TODO: 【1】：用户登录
- *             用户登录
- *                   设置refresh access
- *                       if autologin by refreshToken --> access [remove old refresh]
- *                          else access
- *                          if access expire -> by refresh get access [remove old refresh]
- *        【2】：用户注册
- *               enter username passwd and email then by email code get visible
- *        【3】：用户改密码
- *              enter email code target modify passwd website
- *        【4】： 用户注销
- *               user logout -> remove refresh and access
- */
-@Controller('oauth')
+import { Logger } from 'log4js';
+import { AuthService } from '../service/auth.service';
+import * as OAuth2 from 'oauth2-server';
+@Controller('auth')
 export class AuthController {
+  private logger: Logger;
+  constructor(
+    private readonly authService: AuthService,
+    private readonly Log4js: Log4JService,
+  ) {
+    this.logger = this.Log4js.getLogger(AuthController.name);
+  }
+
   /**
    * 登录
    * @param req
@@ -24,7 +21,11 @@ export class AuthController {
    */
   @Post('token')
   async getToken(@Req() req: Request, @Res() resp: Response) {
-    return null;
+    const token = await this.authService.getToken(
+      new OAuth2.Request(req),
+      new OAuth2.Response(resp),
+    );
+    resp.status(HttpStatus.OK).json(token);
   }
 
   /**
@@ -36,4 +37,13 @@ export class AuthController {
   async removeToken(@Req() req: Request, @Res() resp: Response) {
     return null;
   }
+
+  @Get('valid-mail')
+  async checkMail() {}
+
+  /**
+   * 验证邮箱code
+   */
+  @Post('code')
+  async checkCode() {}
 }
