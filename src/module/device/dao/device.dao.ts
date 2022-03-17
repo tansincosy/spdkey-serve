@@ -34,4 +34,45 @@ export class DeviceDao {
     this.logger.debug('[findDeviceById] client >>>', client);
     return client;
   }
+
+  async findUserDeviceByClientIdAndUserId(deviceId: string, userId: string) {
+    this.logger.info(
+      '[findUserDeviceByClientIdAndUserId] deviceId >>',
+      deviceId,
+      'userId>>>',
+      userId,
+    );
+    const hasUserLinkClient = await this.prismaService.device.findFirst({
+      where: {
+        deviceId,
+        userId,
+      },
+    });
+    this.logger.debug(
+      '[findUserDeviceByClientIdAndUserId] hasUserLinkClient >>>',
+      hasUserLinkClient,
+    );
+    return hasUserLinkClient;
+  }
+
+  async saveDeviceLinkUserWithClientIdAndUserId(
+    deviceId: string,
+    userId: string,
+  ) {
+    this.logger.info(
+      '[saveDeviceLinkUserWithClientIdAndUserId] deviceId >>',
+      deviceId,
+      'userId>>>',
+      userId,
+    );
+    await this.prismaService.device.create({
+      data: {
+        deviceId,
+        userId,
+      },
+    });
+    this.logger.info(
+      '[saveDeviceLinkUserWithClientIdAndUserId] save successFully',
+    );
+  }
 }

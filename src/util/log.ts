@@ -5,7 +5,7 @@ export class Log implements LoggerService {
   private lo4j: Log4js;
 
   constructor(private readonly configuration: Configuration) {
-    this.lo4j = configure(configuration);
+    this.lo4j = configure(this.configuration);
   }
 
   getLogger(moduleName: string) {
