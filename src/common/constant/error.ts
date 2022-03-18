@@ -1,19 +1,9 @@
-export enum BasicExceptionCode {
-  CLIENT_IS_ILLEGAL = 101005,
-  USERNAME_OR_PASSWORD_IS_ERROR = 101001,
-  USER_HAD_LOCKED = 101002,
-  SCOPE_INVALID = 101003,
-  SCOPE_IS_WRONG = 101004,
-  CLIENT_HAD_LOCKED = 101006,
-  CLIENT_INVALID = 101007,
-  TOKEN_INVALID = 101008,
-  REFRESH_TOKEN_INVALID = 101009,
-  UN_SUPPORT_GRANT_TYPE = 101010,
-  INVALID_REQUEST_ERROR = 101011,
-  ACCESS_TOKEN_EXPIRED = 101012,
-  UNAUTHORIZED_REQUEST = 101013,
-}
-export const BasicException = new Map<BasicExceptionCode, string>([
+import { BasicExceptionCode, UserExceptionCode } from './error.code';
+
+export const BasicException = new Map<
+  BasicExceptionCode | UserExceptionCode,
+  string
+>([
   [BasicExceptionCode.CLIENT_IS_ILLEGAL, 'Invalid client: illegal device'],
   [
     BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR,
@@ -45,4 +35,5 @@ export const BasicException = new Map<BasicExceptionCode, string>([
     'Invalid token: access token has expired',
   ],
   [BasicExceptionCode.UNAUTHORIZED_REQUEST, 'unauthorized_request'],
+  [UserExceptionCode.USER_ADD_FAILED, 'user add failed'],
 ]);

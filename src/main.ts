@@ -9,14 +9,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new Log(logConfig),
   });
-  await app.listen(process.env.PORT || 3000);
   const log = app.get(Log4JService).getLogger(bootstrap.name);
   app.useGlobalFilters(new AllExceptionFilter(app.get(Log4JService)));
   app.useGlobalPipes(
     new ValidationPipe({
-      skipMissingProperties: true,
+      // skipMissingProperties: true,
+      enableDebugMessages: true,
     }),
   );
+  await app.listen(process.env.PORT || 3000);
   const banner = await readFileSync('banner.txt');
   log.info(`
 ${banner}

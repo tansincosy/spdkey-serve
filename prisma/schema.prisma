@@ -39,6 +39,8 @@ model User {
   createdAt   DateTime       @default(now()) @map("created_at")
   username    String?        @unique @default("")
   password    String?        @default("")
+  email       String?        @unique @default("")
+  emailCode   String?        @default("") @map("email_code")
   isLocked    Int?           @default(0) @map("is_locked")
   scopes      ScopeOnUser[]
   devices     UserOnDevice[]

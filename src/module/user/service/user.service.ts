@@ -1,47 +1,73 @@
-import { Log4JService } from '@/common';
+import { BaseException, Log4JService, UserExceptionCode } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
 import { UserDao } from '../dao/user.dao';
 import { RegisterParam } from '../types/controller.param';
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 @Injectable()
 export class UserService {
   private log: Logger;
   constructor(
     private readonly log4JService: Log4JService,
     private userDao: UserDao,
+    private readonly configService: ConfigService,
   ) {
     this.log = this.log4JService.getLogger(UserService.name);
   }
+
+  /**
+   * 用户注册
+   * @param userParams
+   * @returns
+   */
   async userRegister(userParams: RegisterParam) {
-    this.userDao.userRegister();
-    this.sendCodeWithMail();
-    return null;
+    const { id } = await this.userDao.userRegister(userParams);
+    if (!id) {
+      this.log.warn('[userRegister] user add failed');
+      throw new BaseException(UserExceptionCode.USER_ADD_FAILED);
+    }
+    this.log.info('[userRegister] user add successFully !!');
+    await this.sendCodeWithMail(userParams.email);
+    return { id };
   }
 
-  async sendCodeWithMail() {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: 'ss', // generated ethereal user
-        pass: '', // generated ethereal password
-      },
-    });
-    const info = await transporter.sendMail({
-      from: '"Fred Foo 👻" <foo@example.com>', // sender address
-      to: '805841483@qq.com', // list of receivers
-      subject: 'Hello ✔', // Subject line
-      text: 'Hello world?', // plain text body
-      html: '<b>Hello world?</b>', // html body
-    });
-
-    this.log.info('Message sent: %s', info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // Preview only available when sending through an Ethereal account
-    this.log.info('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  /**
+   * 发送邮件
+   * @param userEmail
+   */
+  async sendCodeWithMail(userEmail: string) {
+    this.log.info(
+      '[sendCodeWithMail] start send message by mail, mail=',
+      userEmail,
+    );
+    const nodeMailerConfig =
+      this.configService.get<SMTPTransport.Options>('eMail');
+    this.log.debug('nodeMailerConfig', nodeMailerConfig);
+    if (!nodeMailerConfig.host) {
+      this.log.warn(
+        `There is no configuration for the mailbox in the
+        configuration file or there is a problem with the configuration format,
+         skip sending the mailbox`,
+      );
+      return;
+    }
+    const transporter = nodemailer.createTransport(nodeMailerConfig);
+    await transporter
+      .sendMail({
+        from: '"Fred Foo 👻" <stupidonkey@foxmail.com>', // sender address
+        to: userEmail, // list of receivers
+        subject: 'Hello ✔', // Subject line
+        text: 'Hello world?', // plain text body
+        html: '<b>Hello world?</b>', // html body
+      })
+      .catch((error) => {
+        this.log.error(
+          '[sendCodeWithMail] send message by mail failed, message=',
+          error,
+        );
+      });
+    this.log.info('[sendCodeWithMail] send message successFully!!');
   }
 }

@@ -19,7 +19,10 @@ import {
   UnauthorizedClientError,
   UnauthorizedRequestError,
 } from 'oauth2-server';
-import { PrismaClientValidationError } from '@prisma/client/runtime';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime';
 import { BaseException } from '../exception/base.exception';
 import { Logger } from 'log4js';
 import { Log4JService } from '../service/log4j.service';
@@ -62,13 +65,14 @@ export class AllExceptionFilter implements ExceptionFilter {
       case exception instanceof BadRequestException:
         response.status(HttpStatus.BAD_REQUEST).json({
           errorCode: 'MOV:601001',
-          errorMessage: '参数异常',
+          errorMessage: `${exception?.response?.message}`,
         });
         break;
       case exception instanceof PrismaClientValidationError:
+      case exception instanceof PrismaClientKnownRequestError:
         response.status(HttpStatus.BAD_REQUEST).json({
           errorCode: 'MOV:701001',
-          errorMessage: '参数异常',
+          errorMessage: '数据库异常',
         });
         break;
       case exception instanceof NotFoundException:

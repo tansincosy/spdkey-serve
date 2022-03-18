@@ -37,12 +37,14 @@ export class AuthController {
   async removeToken(@Req() req: Request, @Res() resp: Response) {
     return null;
   }
-
+  /**
+   * 邮箱跳转地址
+   */
   @Get('valid-mail')
   async checkMail() {}
 
   /**
-   * 验证邮箱code
+   * 修改密码时，验证的邮箱code
    */
   @Post('code')
   async checkCode() {}

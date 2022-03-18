@@ -62,4 +62,4 @@ export const logConfig: Configuration = {
     http: { appenders: ['access'], level: 'info' },
   },
 };
-export default registerAs('logger', () => logConfig);
+export const LoggerConfig = registerAs('logger', () => logConfig);

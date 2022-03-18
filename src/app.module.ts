@@ -4,10 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { HttpRequestMiddleware } from './common/middleware/http-request.middleware';
-import log4jsConfig from './config/log4js.config';
 import * as store from 'cache-manager-redis-store';
 import { UserModule } from './module/user/user.module';
 import { DeviceModule } from './module/device/device.module';
+import { EmailConfig, LoggerConfig } from './config';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { DeviceModule } from './module/device/device.module';
       cache: true,
       isGlobal: true,
       ignoreEnvFile: false,
-      load: [log4jsConfig],
+      load: [LoggerConfig, EmailConfig],
     }),
     CacheModule.register({
       store,

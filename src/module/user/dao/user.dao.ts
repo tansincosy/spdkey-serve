@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
 import { Log4JService } from '@/common';
 import { PrismaService } from '@/common/service/prisma.service';
+import { RegisterParam } from '../types/controller.param';
+import { UserLocked } from '../types/constant';
 
 @Injectable()
 export class UserDao {
@@ -30,5 +32,28 @@ export class UserDao {
     return user;
   }
 
-  async userRegister() {}
+  async userRegister(userParam: RegisterParam): Promise<{ id?: string }> {
+    this.logger.info('[userRegister] userRegister');
+    const createSave = await this.prismaService.user.create({
+      data: {
+        username: userParam.username,
+        password: userParam.password,
+        email: userParam.email,
+        isLocked: UserLocked.LOCKED,
+        scopes: {
+          create: {
+            scope: {
+              create: {
+                name: 'web',
+              },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+    return createSave || {};
+  }
 }

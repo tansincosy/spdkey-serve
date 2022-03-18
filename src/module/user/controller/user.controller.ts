@@ -19,6 +19,11 @@ import { RegisterParam } from '../types/controller.param';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  /**
+   * 用户注册
+   * @param userParam
+   * @returns
+   */
   @Post('register')
   userRegister(@Body() userParam: RegisterParam) {
     return this.userService.userRegister(userParam);

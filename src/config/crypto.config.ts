@@ -8,7 +8,7 @@ export interface CryptoConfig {
   aesIV: string;
 }
 
-export default registerAs('crypto', () => ({
+export const CryptoConfig = registerAs('crypto', () => ({
   accessToken: process.env.TOKEN_ACCESS || '',
   refreshToken: process.env.TOKEN_REFRESH || '',
   passToken: process.env.TOKEN_PASS || '',
