@@ -71,8 +71,8 @@ export class AllExceptionFilter implements ExceptionFilter {
       case exception instanceof PrismaClientValidationError:
       case exception instanceof PrismaClientKnownRequestError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:701001',
-          errorMessage: '数据库异常',
+          errorCode: exception.code,
+          errorMessage: exception.meta.target,
         });
         break;
       case exception instanceof NotFoundException:

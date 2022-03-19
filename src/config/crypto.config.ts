@@ -4,14 +4,14 @@ export interface CryptoConfig {
   accessToken: string;
   refreshToken: string;
   passToken: string;
-  aesKey: string;
-  aesIV: string;
+  encryptedKey: string;
+  encryptedIV: string;
 }
 
 export const CryptoConfig = registerAs('crypto', () => ({
-  accessToken: process.env.TOKEN_ACCESS || '',
-  refreshToken: process.env.TOKEN_REFRESH || '',
-  passToken: process.env.TOKEN_PASS || '',
-  aesKey: process.env.AES_KEY || 'cLKIHvnWLbiVXnSn',
-  aesIV: process.env.AES_IV || 'pHenBAGKuZLaZpXl',
+  accessToken: process.env.token_access || '',
+  refreshToken: process.env.token_refresh || '',
+  passToken: process.env.token_pass || '',
+  encryptedKey: process.env.encrypted_key || 'cLKIHvnWLbiVXnSn',
+  encryptedIV: process.env.encrypted_iv || 'pHenBAGKuZLaZpXl',
 }));

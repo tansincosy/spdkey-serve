@@ -9,7 +9,7 @@ import { RegisterParam } from '../types/controller.param';
  *                       if autologin by refreshToken --> access [remove old refresh]
  *                          else access
  *                          if access expire -> by refresh get access [remove old refresh]
- *        【2】：用户注册
+ *        【2】：用户注册 【pass】
  *               enter username passwd and email then by email code get visible
  *        【3】：用户改密码
  *              enter email code target modify passwd website
@@ -20,7 +20,7 @@ import { RegisterParam } from '../types/controller.param';
 export class UserController {
   constructor(private readonly userService: UserService) {}
   /**
-   * 用户注册
+   * 用户注册 TODO: 测试pass
    * @param userParam
    * @returns
    */

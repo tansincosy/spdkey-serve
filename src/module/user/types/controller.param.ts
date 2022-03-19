@@ -21,11 +21,11 @@ export class RegisterParam {
   readonly email: string;
   @IsString()
   @MinLength(10, {
-    message: '密码太短，请输入8-16之间',
+    message: '密码太短, 请输入8-16之间',
   })
   @MaxLength(50, {
-    message: '密码太长，请输入8-16之间',
+    message: '密码太长, 请输入8-16之间',
   })
   @IsNotEmpty()
-  readonly password: string;
+  password: string;
 }

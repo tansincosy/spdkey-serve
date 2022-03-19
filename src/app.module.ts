@@ -7,7 +7,7 @@ import { HttpRequestMiddleware } from './common/middleware/http-request.middlewa
 import * as store from 'cache-manager-redis-store';
 import { UserModule } from './module/user/user.module';
 import { DeviceModule } from './module/device/device.module';
-import { EmailConfig, LoggerConfig } from './config';
+import { CryptoConfig, EmailConfig, LoggerConfig } from './config';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { EmailConfig, LoggerConfig } from './config';
       cache: true,
       isGlobal: true,
       ignoreEnvFile: false,
-      load: [LoggerConfig, EmailConfig],
+      load: [LoggerConfig, EmailConfig, CryptoConfig],
     }),
     CacheModule.register({
       store,

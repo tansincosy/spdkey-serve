@@ -1,5 +1,13 @@
 import { Log4JService } from '@/common';
-import { Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Logger } from 'log4js';
 import { AuthService } from '../service/auth.service';
@@ -40,8 +48,10 @@ export class AuthController {
   /**
    * 邮箱跳转地址
    */
-  @Get('valid-mail')
-  async checkMail() {}
+  @Get('mail-valid/:mailCode')
+  async checkMail(@Param('mailCode') mailCode: string) {
+    return this.authService.checkMail(mailCode);
+  }
 
   /**
    * 修改密码时，验证的邮箱code

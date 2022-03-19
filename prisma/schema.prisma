@@ -41,7 +41,8 @@ model User {
   password    String?        @default("")
   email       String?        @unique @default("")
   emailCode   String?        @default("") @map("email_code")
-  isLocked    Int?           @default(0) @map("is_locked")
+  isLocked    Int?           @default(1) @map("is_locked")
+  isValid     Int            @default(1) @map("is_valid")
   scopes      ScopeOnUser[]
   devices     UserOnDevice[]
   deviceLimit Int?           @default(5) @map("device_limit")

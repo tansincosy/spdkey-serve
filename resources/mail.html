@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+        .container{
+            margin: 0 auto;
+            max-width: 400px;
+        }
+        .button {
+            background-color: rgba(192, 31, 36, 1);
+            color: white;
+            width: 200px;
+            height: 46px;
+            border-radius: 2px;
+            display: inline-block;
+            text-align: center;
+            line-height: 46px;
+            cursor: pointer;
+            text-decoration: none
+        }
+
+        a[href]{
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo"></div>
+    <div class="big-title">
+        <h1>欢迎您加入 Stupidonkey</h1>
+    </div>
+    <article>
+        <p>您好，<span>${userName}</span> ! </p>
+        <p>已为您准备好电影、电视剧！</p>
+        <p><a href="${validateLink}" class="button">开始观看</a></p>
+        <h2>您账号信息：</h2>
+        <h3>邮箱：</h3>
+        <p>${mail}</p>
+        <h3>年龄等级：</h3>
+        <p>${ageLevel}</p>
+    </article>
+    <footer>
+        <p>此致 Stupidonkey &copy;</p>
+    </footer>
+</div>
+</body>
+</html>

@@ -36,4 +36,7 @@ export const BasicException = new Map<
   ],
   [BasicExceptionCode.UNAUTHORIZED_REQUEST, 'unauthorized_request'],
   [UserExceptionCode.USER_ADD_FAILED, 'user add failed'],
+  [BasicExceptionCode.PASS_WORD_ENCRYPTED_SUCCESS, '[encrypted] params error!'],
+  [BasicExceptionCode.CHECK_CODE_ERROR, 'Email parameter exception !'],
+  [BasicExceptionCode.EMAIL_HAS_BEEN_VALID, 'Email has been validated !!'],
 ]);
