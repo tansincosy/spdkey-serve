@@ -1,10 +1,20 @@
+import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import * as OAuth2 from 'oauth2-server';
-import { BaseException, BasicExceptionCode, Log4JService } from '@/common';
+import {
+  BaseException,
+  BasicExceptionCode,
+  Log4JService,
+  UserExceptionCode,
+} from '@/common';
 import { Logger } from 'log4js';
 import { AuthModelService } from './auth-model.service';
 import { UserDao } from '../dao/user.dao';
 import { HAS_VALID } from '../types/constant';
+import { CheckCode, ModifyParam } from '../types/controller.param';
+import { UserService } from './user.service';
+import { atob, btoa, encrypt, joinKey } from '@/util';
+import { CryptoConfig } from '@/config';
 @Injectable()
 export class AuthService {
   private logger: Logger;
@@ -12,6 +22,8 @@ export class AuthService {
     private readonly modelService: AuthModelService,
     private readonly userDao: UserDao,
     private readonly log4js: Log4JService,
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {
     this.logger = this.log4js.getLogger(AuthService.name);
   }
@@ -55,6 +67,84 @@ export class AuthService {
     }
     const { id } = await this.userDao.updateUserValid(username);
     this.logger.info("[checkMail] update user's  valid successfully!!");
+    return { id };
+  }
+
+  async checkMailCode(checkCode: CheckCode) {
+    const { emailCode } = await this.userDao.findUserByUsernameAndEMail(
+      checkCode.username,
+      checkCode.email,
+    );
+    if (emailCode && emailCode === checkCode.emailCode) {
+      const generateNewMailCode = await this.userService.encryptedWithPbkdf2(
+        checkCode.username,
+      );
+      const newJoinKey = joinKey(
+        checkCode.username,
+        checkCode.email,
+        generateNewMailCode,
+      );
+      const newMailCode = btoa(newJoinKey);
+      this.logger.debug('[checkMailCode] begin set new mail code');
+      //设置新的 mailcode 为修改密码做准备
+      await this.userDao.updateUserMailCode(checkCode.username, newMailCode);
+      return {
+        authCode: newMailCode,
+      };
+    } else {
+      this.logger.warn(
+        '[checkMailCode] check code verifycode is [%s], db verifycode is [%s]',
+        checkCode.emailCode,
+        emailCode,
+      );
+      throw new BaseException(UserExceptionCode.VERIFY_CODE_ERROR);
+    }
+  }
+
+  async modifyPassword(modifyParam: ModifyParam): Promise<{ id: string }> {
+    this.logger.debug('[modifyPassword] begin modify password');
+    const { password, authCode } = modifyParam;
+    const authCodeStr = atob(authCode);
+    const [username, email, newMailCode] = authCodeStr.split(':');
+    if (!username || !email || !newMailCode) {
+      this.logger.warn(
+        '[modifyPassword] username = %s, email = %s, newMailCode = %s',
+        username,
+        email,
+        newMailCode,
+      );
+      throw new BaseException(BasicExceptionCode.UPDATE_PASSWORD_FAILED);
+    }
+
+    const { emailCode } = await this.userDao.findUserByUsernameAndEMail(
+      username,
+      email,
+    );
+    if (emailCode !== newMailCode) {
+      this.logger.warn(
+        '[modifyPassword] emailCode = %s, newMailCode = %s',
+        emailCode,
+        newMailCode,
+      );
+      throw new BaseException(BasicExceptionCode.UPDATE_PASSWORD_FAILED);
+    }
+
+    const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
+    const encryptPassword = encrypt(
+      cryptoConfig.encryptedKey,
+      cryptoConfig.encryptedIV,
+      password,
+    );
+
+    const { id } = await this.userDao.updateUserPassword(
+      username,
+      encryptPassword,
+    );
+    if (!id) {
+      this.logger.warn('[modifyPassword] update db failed!!');
+      throw new BaseException(BasicExceptionCode.UPDATE_PASSWORD_FAILED);
+    }
+    this.logger.info('[modifyPassword] update password successfully !!');
     return { id };
   }
 }

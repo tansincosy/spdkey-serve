@@ -39,4 +39,7 @@ export const BasicException = new Map<
   [BasicExceptionCode.PASS_WORD_ENCRYPTED_SUCCESS, '[encrypted] params error!'],
   [BasicExceptionCode.CHECK_CODE_ERROR, 'Email parameter exception !'],
   [BasicExceptionCode.EMAIL_HAS_BEEN_VALID, 'Email has been validated !!'],
+  [UserExceptionCode.FORGOT_PASS_TO_MAIL_CODE_FAILED, 'user is not exist!'],
+  [UserExceptionCode.VERIFY_CODE_ERROR, "user's verify code is incorrect"],
+  [BasicExceptionCode.UPDATE_PASSWORD_FAILED, 'change password failed'],
 ]);

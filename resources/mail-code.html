@@ -23,20 +23,20 @@
 <div class="container">
     <div class="logo"></div>
     <div class="big-title">
-        <h1>欢迎您加入 Tomoko</h1>
+        <h1>欢迎您加入 Stupidonkey</h1>
     </div>
     <article>
-        <p>您好，<span th:text="${userName}"></span> ! </p>
+        <p>您好，<span>${userName}</span> ! </p>
         <p>您的验证码：</p>
-        <p th:text="${code}" class="code"></p>
+        <p class="code">${code}</p>
         <h2>您账号信息：</h2>
         <h3>邮箱：</h3>
-        <p th:text="${mail}"></p>
+        <p>${mail}</p>
         <h3>年龄等级：</h3>
-        <p th:text="${ageLevel}"></p>
+        <p>${ageLevel}</p>
     </article>
     <footer>
-        <p>此致 Tomoko &copy;</p>
+        <p>此致 Stupidonkey &copy;</p>
     </footer>
 </div>
 </body>

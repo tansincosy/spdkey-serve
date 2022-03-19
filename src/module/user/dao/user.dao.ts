@@ -77,4 +77,42 @@ export class UserDao {
       },
     });
   }
+
+  async updateUserMailCode(username: string, mailCode: string) {
+    this.logger.info('[updateUserMailCode] updateUserMailCode');
+    return await this.prismaService.user.update({
+      data: {
+        emailCode: mailCode,
+      },
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
+
+  async findUserByUsernameAndEMail(username: string, email: string) {
+    return await this.prismaService.user.findFirst({
+      where: {
+        username,
+        email,
+      },
+    });
+  }
+
+  async updateUserPassword(username: string, password: string) {
+    return await this.prismaService.user.update({
+      data: {
+        password,
+      },
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
 }

@@ -1,5 +1,6 @@
 import { Log4JService } from '@/common';
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
@@ -12,6 +13,7 @@ import { Request, Response } from 'express';
 import { Logger } from 'log4js';
 import { AuthService } from '../service/auth.service';
 import * as OAuth2 from 'oauth2-server';
+import { CheckCode, ModifyParam } from '../types/controller.param';
 @Controller('auth')
 export class AuthController {
   private logger: Logger;
@@ -56,6 +58,13 @@ export class AuthController {
   /**
    * 修改密码时，验证的邮箱code
    */
-  @Post('code')
-  async checkCode() {}
+  @Post('mail-code')
+  async checkCode(@Body() checkCode: CheckCode) {
+    return this.authService.checkMailCode(checkCode);
+  }
+
+  @Post('modify-password')
+  async modifyPassword(@Body() modifyParam: ModifyParam) {
+    return this.authService.modifyPassword(modifyParam);
+  }
 }

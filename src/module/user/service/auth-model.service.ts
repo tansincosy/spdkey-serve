@@ -5,7 +5,6 @@ import { Logger } from 'log4js';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import OAuth2Server, {
-  Callback,
   Client,
   Falsey,
   PasswordModel,
@@ -18,7 +17,8 @@ import { DeviceDao } from '@/module/device/dao/device.dao';
 import isEmpty from 'lodash/isEmpty';
 import { sign } from 'jsonwebtoken';
 import { format } from 'util';
-import { secretMask } from '@/util';
+import { decrypt, secretMask } from '@/util';
+import { CryptoConfig } from '@/config';
 
 enum DeviceStatus {
   LOCKED = 1,
@@ -99,22 +99,21 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     );
   }
 
-  async getUser(
-    username: string,
-    password: string,
-    callback?: Callback<User | Falsey>,
-  ): Promise<User | Falsey> {
+  async getUser(username: string, password: string): Promise<User | Falsey> {
     const user = await this.userDao.findUserByName(username);
     if (isEmpty(user)) {
       this.logger.warn('[getUser] user is empty');
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }
-    const passToken = this.configService.get<string>('crypto.passToken');
+    const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
 
-    const md5Password = '';
-
-    this.logger.debug('[getUser] dePass = %s', md5Password);
-    if (user.password !== md5Password) {
+    const decryptPassword = decrypt(
+      cryptoConfig.encryptedKey,
+      cryptoConfig.encryptedIV,
+      password,
+    );
+    this.logger.debug('[getUser] dePass = %s', secretMask(decryptPassword));
+    if (user.password !== decryptPassword) {
       this.logger.warn("[getUser] user's password is wrong");
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }

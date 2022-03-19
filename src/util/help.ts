@@ -87,3 +87,17 @@ export function decrypt(key, iv, crypted) {
   const decipher = createDecipheriv('aes-128-cbc', key, iv);
   return decipher.update(crypted, 'binary', 'utf8') + decipher.final('utf8');
 }
+
+export function btoa(botaStr): string {
+  return Buffer.from(botaStr).toString('base64');
+}
+
+export function atob(b64Encoded): string {
+  return Buffer.from(b64Encoded, 'base64').toString();
+}
+
+export function joinKey(...keys: string[]) {
+  return keys.reduce((total, cur) => {
+    return total + ':' + cur;
+  });
+}

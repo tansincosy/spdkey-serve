@@ -178,4 +178,30 @@ export class UserService {
     });
     return htmlStrByParams;
   }
+
+  async forgotPassword(username: string) {
+    const user = await this.userDao.findUserByName(username);
+    const htmlStr = await this.getHTMLContentFromFile('mail-code');
+    const validCode = Math.random().toString().slice(-6);
+
+    const { id } = await this.userDao.updateUserMailCode(username, validCode);
+
+    if (id) {
+      const mailContent = this.concatText(htmlStr, {
+        userName: username,
+        mail: user.email,
+        code: validCode,
+        ageLevel: '18',
+      });
+      await this.sendCodeWithMail(user.email, mailContent);
+    } else {
+      throw new BaseException(
+        UserExceptionCode.FORGOT_PASS_TO_MAIL_CODE_FAILED,
+      );
+    }
+
+    return {
+      id: user.id,
+    };
+  }
 }
