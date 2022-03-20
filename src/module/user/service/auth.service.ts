@@ -120,9 +120,15 @@ export class AuthService {
       username,
       email,
     );
-    if (emailCode !== newMailCode) {
+    if (emailCode === HAS_VALID) {
       this.logger.warn(
-        '[modifyPassword] emailCode = %s, newMailCode = %s',
+        '[modifyPassword] mailCode is not equal, has been valid',
+      );
+      throw new BaseException(BasicExceptionCode.EMAIL_HAS_BEEN_VALID);
+    }
+    if (emailCode !== modifyParam.authCode) {
+      this.logger.warn(
+        '[modifyPassword] mailCode is not equal, emailCode = %s, authCode = %s',
         emailCode,
         newMailCode,
       );
@@ -144,6 +150,7 @@ export class AuthService {
       this.logger.warn('[modifyPassword] update db failed!!');
       throw new BaseException(BasicExceptionCode.UPDATE_PASSWORD_FAILED);
     }
+    await this.userDao.updateUserValid(username);
     this.logger.info('[modifyPassword] update password successfully !!');
     return { id };
   }

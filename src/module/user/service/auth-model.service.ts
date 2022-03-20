@@ -205,7 +205,7 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     }
     const grants = client.grants;
     return {
-      id: client.id + '',
+      id: client.id,
       accessTokenLifetime: client.accessTokenValidateSeconds,
       refreshTokenLifetime: client.refreshTokenValidateSeconds,
       grants: grants.map((item) => item.grant.name),
@@ -283,8 +283,11 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       throw new BaseException(BasicExceptionCode.TOKEN_INVALID);
     }
 
-    this.logger.debug('[getAccessToken] token = %s', token);
-    this.logger.debug('[getAccessToken] token.grants = %s', token.grants);
+    this.logger.debug(
+      '[getAccessToken] token = %s , token.grants = %s',
+      token,
+      token.grants,
+    );
 
     return {
       accessToken: token.accessToken,

@@ -13,7 +13,7 @@ export const logConfig: Configuration = {
     access: {
       type: 'dateFile',
       filename: 'logs/access.log',
-      pattern: '-yyyy-MM-dd',
+      pattern: 'yyyy-MM-dd',
       category: 'http',
       layout: {
         type: 'pattern',
@@ -23,7 +23,7 @@ export const logConfig: Configuration = {
     appLog: {
       type: 'dateFile',
       filename: `logs/app.log`,
-      pattern: '-yyyy-MM-dd',
+      pattern: 'yyyy-MM-dd',
       keepFileExt: true,
       compress: true,
       layout: {

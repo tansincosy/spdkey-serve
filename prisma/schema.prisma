@@ -40,7 +40,7 @@ model User {
   username    String?        @unique @default("")
   password    String?        @default("")
   email       String?        @unique @default("")
-  emailCode   String?        @default("") @map("email_code")
+  emailCode   String?        @map("email_code") @db.Text
   isLocked    Int?           @default(1) @map("is_locked")
   isValid     Int            @default(1) @map("is_valid")
   scopes      ScopeOnUser[]

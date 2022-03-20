@@ -1,3 +1,3 @@
-class DeviceService {
-  constructor(parameters) {}
-}
+import { Injectable } from '@nestjs/common';
+@Injectable()
+export class DeviceService {}

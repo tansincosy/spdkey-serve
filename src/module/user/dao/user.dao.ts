@@ -80,6 +80,12 @@ export class UserDao {
 
   async updateUserMailCode(username: string, mailCode: string) {
     this.logger.info('[updateUserMailCode] updateUserMailCode');
+    this.logger.debug(
+      'updateUserMailCode username = %s , mailCode = %s',
+      username,
+      mailCode,
+    );
+
     return await this.prismaService.user.update({
       data: {
         emailCode: mailCode,
