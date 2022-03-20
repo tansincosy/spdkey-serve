@@ -14,8 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import * as fs from 'fs';
-import { encrypt, generateTemplateString } from '@/util';
-import { randomUUID, pbkdf2 } from 'crypto';
+import { encrypt, encryptedWithPbkdf2, generateTemplateString } from '@/util';
 import { CryptoConfig } from '@/config';
 
 @Injectable()
@@ -48,11 +47,9 @@ export class UserService {
     );
     userParams.password = encryptPassword;
     this.log.info('[userRegister] encrypt Password successFully !!');
-    const emailCode = await this.encryptedWithPbkdf2(userParams.email).catch(
-      () => {
-        throw new BaseException(BasicExceptionCode.PASS_WORD_ENCRYPTED_SUCCESS);
-      },
-    );
+    const emailCode = await encryptedWithPbkdf2(userParams.email).catch(() => {
+      throw new BaseException(BasicExceptionCode.PASS_WORD_ENCRYPTED_SUCCESS);
+    });
     const { id } = await this.userDao.userRegister(userParams, emailCode);
     if (!id) {
       this.log.warn('[userRegister] user add failed');
@@ -80,23 +77,6 @@ export class UserService {
     }
 
     return { id };
-  }
-
-  encryptedWithPbkdf2(userPassword: string): Promise<string> {
-    const salt = randomUUID();
-    let primaryDriverKey = '';
-    return new Promise((resolve, reject) => {
-      pbkdf2(userPassword, salt, 1000, 64, 'sha512', (err, derivedKey) => {
-        if (err) {
-          primaryDriverKey = '';
-          this.log.error('[encryptedUserPasswd] encrypted password failed!!');
-          reject(primaryDriverKey);
-          return;
-        }
-        primaryDriverKey = derivedKey.toString('hex');
-        resolve(primaryDriverKey);
-      });
-    });
   }
 
   /**

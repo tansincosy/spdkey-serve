@@ -1,4 +1,14 @@
-import { createCipheriv, createDecipheriv } from 'crypto';
+import { logConfig } from '@/config';
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  pbkdf2,
+  randomUUID,
+} from 'crypto';
+import { Log } from './log';
+
+const logger = new Log(logConfig).getLogger('Help');
 
 export type Edge<T> = {
   node: T;
@@ -99,5 +109,39 @@ export function atob(b64Encoded): string {
 export function joinKey(...keys: string[]) {
   return keys.reduce((total, cur) => {
     return total + ':' + cur;
+  });
+}
+
+/**
+ *
+ * @param defaultStr
+ * @param salt
+ * @returns
+ */
+export function md5(defaultStr = '', salt = ''): string {
+  const saltStr = `${defaultStr}:${salt}`;
+  const md5 = createHash('md5');
+  return md5.update(saltStr).digest('hex');
+}
+/**
+ * pbkdf2 加密
+ * @param userPassword
+ * @returns
+ */
+export function encryptedWithPbkdf2(userPassword: string): Promise<string> {
+  //盐值随机
+  const salt = randomUUID();
+  let primaryDriverKey = '';
+  return new Promise((resolve, reject) => {
+    pbkdf2(userPassword, salt, 1000, 64, 'sha512', (err, derivedKey) => {
+      if (err) {
+        primaryDriverKey = '';
+        logger.error('[encryptedUserPasswd] encrypted password failed!!');
+        reject(primaryDriverKey);
+      } else {
+        primaryDriverKey = derivedKey.toString('hex');
+        resolve(primaryDriverKey);
+      }
+    });
   });
 }

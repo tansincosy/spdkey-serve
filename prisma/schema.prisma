@@ -93,11 +93,11 @@ model Device {
   os                          String?         @default("")
   deviceId                    String?         @default("") @map("device_id")
   deviceSecret                String?         @default("") @map("device_secret")
-  isLocked                    Int?            @default(0) @map("is_locked")
+  isLocked                    Int?            @default(1) @map("is_locked")
   accessTokenValidateSeconds  Int             @default(1800) @map("access_token_validate_seconds")
   refreshTokenValidateSeconds Int             @default(604800) @map("refresh_token_validate_seconds")
   users                       UserOnDevice[]
-  isOnline                    Int?            @default(0) @map("is_online") @db.TinyInt
+  isOnline                    Int?            @default(1) @map("is_online") @db.TinyInt
   grants                      GrantOnDevice[]
 
   User   User?   @relation(fields: [userId], references: [id])

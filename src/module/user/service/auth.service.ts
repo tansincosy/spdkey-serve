@@ -13,7 +13,7 @@ import { UserDao } from '../dao/user.dao';
 import { HAS_VALID } from '../types/constant';
 import { CheckCode, ModifyParam } from '../types/controller.param';
 import { UserService } from './user.service';
-import { atob, btoa, encrypt, joinKey } from '@/util';
+import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';
 import { CryptoConfig } from '@/config';
 @Injectable()
 export class AuthService {
@@ -76,9 +76,14 @@ export class AuthService {
       checkCode.email,
     );
     if (emailCode && emailCode === checkCode.emailCode) {
-      const generateNewMailCode = await this.userService.encryptedWithPbkdf2(
-        checkCode.username,
-      );
+      let generateNewMailCode = '';
+      try {
+        generateNewMailCode = await encryptedWithPbkdf2(checkCode.username);
+      } catch (error) {
+        this.logger.error('[checkMailCode] encryptedWithPbkdf2 failed');
+        throw new BaseException(UserExceptionCode.VERIFY_CODE_ERROR);
+      }
+
       const newJoinKey = joinKey(
         checkCode.username,
         checkCode.email,
