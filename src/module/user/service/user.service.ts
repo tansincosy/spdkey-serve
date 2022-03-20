@@ -1,4 +1,4 @@
-import * as isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 import {
   BaseException,
   Log4JService,

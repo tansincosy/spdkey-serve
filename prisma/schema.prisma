@@ -91,7 +91,7 @@ model Device {
   type                        String?         @default("")
   engine                      String?         @default("")
   os                          String?         @default("")
-  deviceId                    String?         @default("") @map("device_id")
+  deviceId                    String?         @unique @default("") @map("device_id")
   deviceSecret                String?         @default("") @map("device_secret")
   isLocked                    Int?            @default(1) @map("is_locked")
   accessTokenValidateSeconds  Int             @default(1800) @map("access_token_validate_seconds")

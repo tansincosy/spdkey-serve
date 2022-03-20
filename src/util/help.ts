@@ -1,4 +1,3 @@
-import { logConfig } from '@/config';
 import {
   createCipheriv,
   createDecipheriv,
@@ -6,9 +5,6 @@ import {
   pbkdf2,
   randomUUID,
 } from 'crypto';
-import { Log } from './log';
-
-const logger = new Log(logConfig).getLogger('Help');
 
 export type Edge<T> = {
   node: T;
@@ -136,7 +132,6 @@ export function encryptedWithPbkdf2(userPassword: string): Promise<string> {
     pbkdf2(userPassword, salt, 1000, 64, 'sha512', (err, derivedKey) => {
       if (err) {
         primaryDriverKey = '';
-        logger.error('[encryptedUserPasswd] encrypted password failed!!');
         reject(primaryDriverKey);
       } else {
         primaryDriverKey = derivedKey.toString('hex');

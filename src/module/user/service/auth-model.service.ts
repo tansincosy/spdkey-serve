@@ -14,7 +14,7 @@ import OAuth2Server, {
   User,
 } from 'oauth2-server';
 import { DeviceDao } from '@/module/device/dao/device.dao';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 import { sign } from 'jsonwebtoken';
 import { format } from 'util';
 import { decrypt, secretMask } from '@/util';
@@ -196,11 +196,12 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     );
     const client = await this.deviceDao.findDeviceById(clientId);
     if (!client || client.deviceSecret !== clientSecret) {
+      this.logger.debug('db deviceSecret = ', client.deviceSecret);
       this.logger.warn('getClient >>> Invalid client: illegal device');
       throw new BaseException(BasicExceptionCode.CLIENT_INVALID);
     }
     if (client.isLocked === DeviceStatus.LOCKED) {
-      this.logger.warn('getClient >>> Invalid client: illegal device');
+      this.logger.warn('getClient >>> Invalid client: CLIENT_HAD_LOCKED');
       throw new BaseException(BasicExceptionCode.CLIENT_HAD_LOCKED);
     }
     const grants = client.grants;

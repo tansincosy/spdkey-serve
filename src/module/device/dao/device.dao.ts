@@ -3,7 +3,7 @@ import { PrismaService } from '@/common/service/prisma.service';
 import { encryptedWithPbkdf2 } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
-import { DeviceLock } from '../types/constant';
+import { DeviceLineStatus, DeviceLock } from '../types/constant';
 import { DeviceDTO } from '../types/device';
 
 @Injectable()
@@ -89,7 +89,8 @@ export class DeviceDao {
         os: device.os,
         type: device.type,
         engine: device.engine,
-        isOnline: DeviceLock.UN_LOCKED,
+        isOnline: DeviceLineStatus.ONLINE,
+        isLocked: DeviceLock.UN_LOCKED,
         deviceSecret,
       },
       select: {
