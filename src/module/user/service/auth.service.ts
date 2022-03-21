@@ -22,7 +22,6 @@ export class AuthService {
     private readonly modelService: AuthModelService,
     private readonly userDao: UserDao,
     private readonly log4js: Log4JService,
-    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {
     this.logger = this.log4js.getLogger(AuthService.name);
