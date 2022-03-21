@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
-import { Log4JService } from '@/common';
-import { PrismaService } from '@/common/service/prisma.service';
+import {
+  HAS_VALID,
+  Log4JService,
+  PrismaService,
+  UserIsValid,
+  UserLocked,
+} from '@/common';
 import { RegisterParam } from '../types/controller.param';
-import { HAS_VALID, UserIsValid, UserLocked } from '../types/constant';
 
 @Injectable()
 export class UserDao {
@@ -44,7 +48,7 @@ export class UserDao {
         email: userParam.email,
         emailCode,
         isValid: UserIsValid.NOT_ALLOW,
-        isLocked: UserLocked.LOCKED,
+        isLocked: UserLocked.UN_LOCK,
         scopes: {
           create: {
             scope: {

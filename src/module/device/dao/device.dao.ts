@@ -1,9 +1,12 @@
-import { Log4JService } from '@/common';
-import { PrismaService } from '@/common/service/prisma.service';
+import {
+  DeviceLineStatus,
+  DeviceLock,
+  Log4JService,
+  PrismaService,
+} from '@/common';
 import { encryptedWithPbkdf2 } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
-import { DeviceLineStatus, DeviceLock } from '../types/constant';
 import { DeviceDTO } from '../types/device';
 
 @Injectable()

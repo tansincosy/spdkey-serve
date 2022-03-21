@@ -4,13 +4,13 @@ import * as OAuth2 from 'oauth2-server';
 import {
   BaseException,
   BasicExceptionCode,
+  HAS_VALID,
   Log4JService,
   UserExceptionCode,
 } from '@/common';
 import { Logger } from 'log4js';
 import { AuthModelService } from './auth-model.service';
 import { UserDao } from '../dao/user.dao';
-import { HAS_VALID } from '../types/constant';
 import { CheckCode, ModifyParam } from '../types/controller.param';
 import { UserService } from './user.service';
 import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';

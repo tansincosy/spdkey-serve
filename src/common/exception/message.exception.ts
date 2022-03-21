@@ -1,4 +1,4 @@
-import { BasicExceptionCode, UserExceptionCode } from './error.code';
+import { BasicExceptionCode, UserExceptionCode } from '../constant';
 
 export const BasicException = new Map<
   BasicExceptionCode | UserExceptionCode,

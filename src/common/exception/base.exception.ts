@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common';
-import { BasicException } from '../constant/error';
-import { BasicExceptionCode, UserExceptionCode } from '../constant/error.code';
+import { BasicExceptionCode, UserExceptionCode } from '../constant';
+import { BasicException } from './message.exception';
 export class BaseException extends HttpException {
   constructor(error: BasicExceptionCode | UserExceptionCode) {
     const msg = BasicException.get(error);

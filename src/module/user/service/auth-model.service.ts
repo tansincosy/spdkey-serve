@@ -1,5 +1,10 @@
 import { UserDao } from './../dao/user.dao';
-import { BaseException, BasicExceptionCode, Log4JService } from '@/common';
+import {
+  BaseException,
+  BasicExceptionCode,
+  Log4JService,
+  UserLocked,
+} from '@/common';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
 import { Cache } from 'cache-manager';
@@ -19,7 +24,6 @@ import { sign } from 'jsonwebtoken';
 import { format } from 'util';
 import { decrypt, secretMask } from '@/util';
 import { CryptoConfig } from '@/config';
-import { UserLocked } from '../types/constant';
 
 enum DeviceStatus {
   LOCKED = 1,

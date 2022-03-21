@@ -1,9 +1,9 @@
 export enum DeviceLock {
   LOCKED = 1,
-  UN_LOCKED = 2,
+  UN_LOCKED = 0,
 }
 
 export enum DeviceLineStatus {
-  ONLINE = 2,
-  OFFLINE = 1,
+  ONLINE = 1,
+  OFFLINE = 0,
 }
