@@ -141,11 +141,7 @@ export class AuthService {
     }
 
     const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
-    const encryptPassword = encrypt(
-      cryptoConfig.encryptedKey,
-      cryptoConfig.encryptedIV,
-      password,
-    );
+    const encryptPassword = encrypt(cryptoConfig.encryptedKey, password);
 
     const { id } = await this.userDao.updateUserPassword(
       username,

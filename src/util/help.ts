@@ -3,9 +3,11 @@ import {
   createDecipheriv,
   createHash,
   pbkdf2,
+  randomBytes,
   randomUUID,
 } from 'crypto';
-
+const algorithm = 'aes-256-cbc';
+const iv = randomBytes(16);
 export type Edge<T> = {
   node: T;
   cursor: string;
@@ -82,16 +84,36 @@ export const generateTemplateString = (function () {
   return generateTemplate;
 })();
 
-export function encrypt(key, iv, data) {
-  const decipher = createCipheriv('aes-128-cbc', key, iv);
-  // decipher.setAutoPadding(true);
-  return decipher.update(data, 'binary', 'base64') + decipher.final('base64');
+export function encrypt(key, text) {
+  // Creating Cipheriv with its parameter
+  const cipher = createCipheriv(algorithm, Buffer.from(key), iv);
+
+  // Updating text
+  let encrypted = cipher.update(text);
+
+  // Using concatenation
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+
+  // Returning iv and encrypted data
+  const ivStr: string = iv.toString('hex');
+  const encryptedData: string = encrypted.toString('hex');
+  return `${encryptedData}:${ivStr}`;
 }
 
-export function decrypt(key, iv, crypted) {
-  crypted = new Buffer(crypted, 'base64').toString('binary');
-  const decipher = createDecipheriv('aes-128-cbc', key, iv);
-  return decipher.update(crypted, 'binary', 'utf8') + decipher.final('utf8');
+export function decrypt(key, encryptedDataParam) {
+  if (!encryptedDataParam) {
+    return '';
+  }
+  const [encryptedData, textIv] = encryptedDataParam.split(':');
+  const bufferIV = Buffer.from(textIv, 'hex');
+  const encryptedText = Buffer.from(encryptedData, 'hex');
+  // Creating Decipher
+  const decipher = createDecipheriv(algorithm, Buffer.from(key), bufferIV);
+
+  // Updating encrypted text
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
 }
 
 export function btoa(botaStr): string {

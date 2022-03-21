@@ -19,6 +19,7 @@ import { sign } from 'jsonwebtoken';
 import { format } from 'util';
 import { decrypt, secretMask } from '@/util';
 import { CryptoConfig } from '@/config';
+import { UserLocked } from '../types/constant';
 
 enum DeviceStatus {
   LOCKED = 1,
@@ -106,19 +107,15 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }
     const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
-
-    const decryptPassword = decrypt(
-      cryptoConfig.encryptedKey,
-      cryptoConfig.encryptedIV,
-      password,
-    );
+    this.logger.info('[getUser] cryptoConfig = ', cryptoConfig.encryptedKey);
+    const decryptPassword = decrypt(cryptoConfig.encryptedKey, user.password);
     this.logger.debug('[getUser] dePass = %s', secretMask(decryptPassword));
-    if (user.password !== decryptPassword) {
+    if (password !== decryptPassword) {
       this.logger.warn("[getUser] user's password is wrong");
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }
 
-    if (+user.isLocked === 1) {
+    if (+user.isLocked === UserLocked.LOCKED) {
       this.logger.warn('[getUser] user is locked');
       throw new BaseException(BasicExceptionCode.USER_HAD_LOCKED);
     }
@@ -195,8 +192,8 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       clientSecret,
     );
     const client = await this.deviceDao.findDeviceById(clientId);
-    if (!client || client.deviceSecret !== clientSecret) {
-      this.logger.debug('db deviceSecret = ', client.deviceSecret);
+    if (isEmpty(client) || client.deviceSecret !== clientSecret) {
+      this.logger.debug('db deviceSecret = ', client);
       this.logger.warn('getClient >>> Invalid client: illegal device');
       throw new BaseException(BasicExceptionCode.CLIENT_INVALID);
     }

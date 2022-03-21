@@ -39,12 +39,8 @@ export class UserService {
     const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
     const nodeMailerConfig =
       this.configService.get<SMTPTransport.Options>('eMail');
-
-    const encryptPassword = encrypt(
-      cryptoConfig.encryptedKey,
-      cryptoConfig.encryptedIV,
-      password,
-    );
+    this.log.debug('cryptoConfig = ', cryptoConfig);
+    const encryptPassword = encrypt(cryptoConfig.encryptedKey, password);
     userParams.password = encryptPassword;
     this.log.info('[userRegister] encrypt Password successFully !!');
     const emailCode = await encryptedWithPbkdf2(userParams.email).catch(() => {

@@ -17,7 +17,7 @@ export class DeviceDao {
   }
 
   async findDeviceById(deviceId: string) {
-    this.logger.info('[findDeviceById] deviceId >>', deviceId);
+    this.logger.info('findDeviceById.deviceId >>', deviceId);
     const client = await this.prismaService.device.findFirst({
       where: {
         deviceId,
