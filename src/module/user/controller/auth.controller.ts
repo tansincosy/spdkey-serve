@@ -1,3 +1,4 @@
+import { AuthModelService } from './../service/auth-model.service';
 import { Log4JService } from '@/common';
 import {
   Body,
@@ -20,6 +21,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly Log4js: Log4JService,
+    private readonly authModelService: AuthModelService,
   ) {
     this.logger = this.Log4js.getLogger(AuthController.name);
   }
@@ -45,7 +47,8 @@ export class AuthController {
    */
   @Get('revoke')
   async removeToken(@Req() req: Request, @Res() resp: Response) {
-    return null;
+    await this.authModelService.revokeTokenForLogin(req.headers.authorization);
+    resp.status(HttpStatus.OK).json({});
   }
   /**
    * 邮箱跳转地址

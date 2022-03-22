@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { UserModule } from '../user/user.module';
 import { DeviceController } from './controller/device.controller';
 import { DeviceDao } from './dao/device.dao';
 import { DeviceService } from './service/device.service';
 
 @Module({
-  imports: [],
+  imports: [forwardRef(() => UserModule)],
   providers: [DeviceDao, DeviceService],
   exports: [DeviceDao],
   controllers: [DeviceController],

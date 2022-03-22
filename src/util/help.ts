@@ -12,8 +12,8 @@ export type Edge<T> = {
   node: T;
   cursor: string;
 };
-export function secretMask(cc: string, num = 4, mask = '*'): string {
-  return cc.slice(-num).padStart(cc.length, mask);
+export function secretMask(cc: string, num = 4, len = 32, mask = '*'): string {
+  return cc.slice(-num).padStart(len, mask);
 }
 
 export function JSON2Object<T>(jsonStringy: string, defaultValue = {}): T {

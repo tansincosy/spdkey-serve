@@ -1,4 +1,3 @@
-import { UserDao } from './../dao/user.dao';
 import {
   BaseException,
   BasicExceptionCode,
@@ -24,6 +23,7 @@ import { sign } from 'jsonwebtoken';
 import { format } from 'util';
 import { decrypt, secretMask } from '@/util';
 import { CryptoConfig } from '@/config';
+import { UserDao } from '../dao/user.dao';
 
 enum DeviceStatus {
   LOCKED = 1,
@@ -50,14 +50,18 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
   }
 
   async getRefreshToken(refreshToken: string): Promise<Falsey | RefreshToken> {
-    this.logger.debug('[getRefreshToken] refreshToken = ', refreshToken);
+    this.logger.debug(
+      '[getRefreshToken] refreshToken = ',
+      secretMask(refreshToken, 10),
+    );
     const token = await this.cacheManger.get<OAuth2Server.Token>(
       format(formats.token, refreshToken),
     );
+
     this.logger.debug('[getRefreshToken] token = %s', token);
 
     if (isEmpty(token)) {
-      this.logger.debug('[getRefreshToken] token is empty');
+      this.logger.warn('[getRefreshToken] token is empty');
       throw new BaseException(BasicExceptionCode.REFRESH_TOKEN_INVALID);
     }
 
@@ -74,6 +78,33 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
         scope: token.userScope,
       },
     };
+  }
+
+  async revokeTokenForLogin(authorization: string) {
+    const [_, accessToken] = authorization.split(' ');
+    this.logger.info('[revokeToken4Login] enter');
+    this.logger.debug(
+      '[revokeToken4Login] accessToken = %s',
+      secretMask(accessToken, 20),
+    );
+    const getAccessTokenValue = await this.cacheManger.get<OAuth2Server.Token>(
+      format(formats.token, accessToken),
+    );
+    if (isEmpty(getAccessTokenValue)) {
+      this.logger.warn('[revokeToken4Login] getAccessTokenValue is empty');
+      return {};
+    }
+    this.logger.info('begin del accessToken>>>>');
+    await this.cacheManger.del(
+      format(formats.token, getAccessTokenValue.accessToken),
+    );
+    this.logger.info('<<<<end del accessToken');
+    this.logger.info('begin del refreshToken>>>>');
+    await this.cacheManger.del(
+      format(formats.token, getAccessTokenValue.refreshToken),
+    );
+    this.logger.info('<<<<end del refreshToken');
+    return {};
   }
 
   async revokeToken(token: Token | RefreshToken): Promise<boolean> {
@@ -191,13 +222,13 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
   ): Promise<Client | Falsey> {
     this.logger.debug(
       '[getClient.deviceId] >>> ',
-      clientId,
+      secretMask(clientId, 10),
       '[getClient.deviceSecret] >>> ',
-      clientSecret,
+      secretMask(clientId, 20),
     );
     const client = await this.deviceDao.findDeviceById(clientId);
     if (isEmpty(client) || client.deviceSecret !== clientSecret) {
-      this.logger.debug('db deviceSecret = ', client);
+      this.logger.debug('db deviceSecret is isEmpty? = ', isEmpty(client));
       this.logger.warn('getClient >>> Invalid client: illegal device');
       throw new BaseException(BasicExceptionCode.CLIENT_INVALID);
     }
