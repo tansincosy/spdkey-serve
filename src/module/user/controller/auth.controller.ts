@@ -1,5 +1,4 @@
 import { AuthModelService } from './../service/auth-model.service';
-import { Log4JService } from '@/common';
 import {
   Body,
   Controller,
@@ -11,20 +10,15 @@ import {
   Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Logger } from 'log4js';
 import { AuthService } from '../service/auth.service';
 import * as OAuth2 from 'oauth2-server';
 import { CheckCode, ModifyParam } from '../types/controller.param';
 @Controller('auth')
 export class AuthController {
-  private logger: Logger;
   constructor(
     private readonly authService: AuthService,
-    private readonly Log4js: Log4JService,
     private readonly authModelService: AuthModelService,
-  ) {
-    this.logger = this.Log4js.getLogger(AuthController.name);
-  }
+  ) {}
 
   /**
    * 登录
@@ -45,9 +39,9 @@ export class AuthController {
    * @param req
    * @param resp
    */
-  @Get('revoke')
+  @Post('revoke')
   async removeToken(@Req() req: Request, @Res() resp: Response) {
-    await this.authModelService.revokeTokenForLogin(req.headers.authorization);
+    await this.authModelService.revokeTokenForLogin(req);
     resp.status(HttpStatus.OK).json({});
   }
   /**

@@ -1,16 +1,17 @@
 import {
   BaseException,
   BasicExceptionCode,
-  Log4JService,
+  Logger,
+  LoggerService,
   UserLocked,
 } from '@/common';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { Logger } from 'log4js';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import OAuth2Server, {
   Client,
   Falsey,
+  InvalidClientError,
   PasswordModel,
   RefreshToken,
   RefreshTokenModel,
@@ -21,9 +22,10 @@ import { DeviceDao } from '@/module/device/dao/device.dao';
 import { isEmpty } from 'lodash';
 import { sign } from 'jsonwebtoken';
 import { format } from 'util';
-import { decrypt, secretMask } from '@/util';
+import { decrypt, secretMask, atob } from '@/util';
 import { CryptoConfig } from '@/config';
 import { UserDao } from '../dao/user.dao';
+import { Request } from 'express';
 
 enum DeviceStatus {
   LOCKED = 1,
@@ -39,14 +41,14 @@ const formats = {
 export class AuthModelService implements PasswordModel, RefreshTokenModel {
   private logger: Logger;
   constructor(
-    private log4js: Log4JService,
+    private logService: LoggerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManger: Cache,
     private readonly configService: ConfigService,
     private readonly deviceDao: DeviceDao,
     private readonly userDao: UserDao,
   ) {
-    this.logger = this.log4js.getLogger(AuthModelService.name);
+    this.logger = this.logService.getLogger(AuthModelService.name);
   }
 
   async getRefreshToken(refreshToken: string): Promise<Falsey | RefreshToken> {
@@ -80,9 +82,23 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     };
   }
 
-  async revokeTokenForLogin(authorization: string) {
-    const [_, accessToken] = authorization.split(' ');
-    this.logger.info('[revokeToken4Login] enter');
+  async revokeTokenForLogin(req: Request) {
+    const authorization = req.headers.authorization;
+
+    const accessToken = req.body.accessToken;
+
+    const [tokenType, clientBasic64] = authorization.split(' ');
+    if (tokenType !== 'Basic') {
+      throw new InvalidClientError(
+        'Invalid client: cannot retrieve client credentials',
+      );
+    }
+    const clientTokenStr = atob(clientBasic64);
+    const [clientId, clientSecret] = clientTokenStr.split(':');
+
+    this.logger.info('revokeTokenForLogin validation client');
+    await this.getClient(clientId, clientSecret);
+
     this.logger.debug(
       '[revokeToken4Login] accessToken = %s',
       secretMask(accessToken, 20),
@@ -94,16 +110,17 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       this.logger.warn('[revokeToken4Login] getAccessTokenValue is empty');
       return {};
     }
-    this.logger.info('begin del accessToken>>>>');
+    this.logger.info('============== begin del accessToken =================');
     await this.cacheManger.del(
       format(formats.token, getAccessTokenValue.accessToken),
     );
-    this.logger.info('<<<<end del accessToken');
-    this.logger.info('begin del refreshToken>>>>');
+    this.logger.info('============== end del accessToken ====================');
+
+    this.logger.info('============== begin del refreshToken ===============');
     await this.cacheManger.del(
       format(formats.token, getAccessTokenValue.refreshToken),
     );
-    this.logger.info('<<<<end del refreshToken');
+    this.logger.info('============== end del refreshToken ===============');
     return {};
   }
 
@@ -224,7 +241,7 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       '[getClient.deviceId] >>> ',
       secretMask(clientId, 10),
       '[getClient.deviceSecret] >>> ',
-      secretMask(clientId, 20),
+      secretMask(clientSecret, 20),
     );
     const client = await this.deviceDao.findDeviceById(clientId);
     if (isEmpty(client) || client.deviceSecret !== clientSecret) {

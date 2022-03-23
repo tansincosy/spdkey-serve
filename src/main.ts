@@ -2,18 +2,18 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { readFileSync } from 'fs';
 import { AppModule } from './app.module';
-import { AllExceptionFilter, Log4JService } from './common';
+import { AllExceptionFilter, LoggerService } from './common';
 import { logConfig } from './config/log4js.config';
 import { Log } from './util';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new Log(logConfig),
   });
-  const log = app.get(Log4JService).getLogger(bootstrap.name);
-  app.useGlobalFilters(new AllExceptionFilter(app.get(Log4JService)));
+  const log = app.get(LoggerService).getLogger(bootstrap.name);
+  app.useGlobalFilters(new AllExceptionFilter(app.get(LoggerService)));
   app.useGlobalPipes(
     new ValidationPipe({
-      // skipMissingProperties: true,
+      skipMissingProperties: true,
       enableDebugMessages: true,
     }),
   );

@@ -1,3 +1,4 @@
+export { Logger } from 'log4js';
 export * from './service/log4j.service';
 export * from './interceptor/http-time.interceptor';
 export * from './exception/base.exception';

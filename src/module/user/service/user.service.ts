@@ -1,12 +1,12 @@
 import { isEmpty } from 'lodash';
 import {
   BaseException,
-  Log4JService,
+  LoggerService,
   BasicExceptionCode,
   UserExceptionCode,
+  Logger,
 } from '@/common';
 import { Injectable } from '@nestjs/common';
-import { Logger } from 'log4js';
 import { UserDao } from '../dao/user.dao';
 import { RegisterParam } from '../types/controller.param';
 import * as nodemailer from 'nodemailer';
@@ -21,11 +21,11 @@ import { CryptoConfig } from '@/config';
 export class UserService {
   private log: Logger;
   constructor(
-    private readonly log4JService: Log4JService,
+    private readonly loggerService: LoggerService,
     private userDao: UserDao,
     private readonly configService: ConfigService,
   ) {
-    this.log = this.log4JService.getLogger(UserService.name);
+    this.log = this.loggerService.getLogger(UserService.name);
   }
 
   /**

@@ -25,7 +25,7 @@ import {
 } from '@prisma/client/runtime';
 import { BaseException } from '../exception/base.exception';
 import { Logger } from 'log4js';
-import { Log4JService } from '../service/log4j.service';
+import { LoggerService } from '../service/log4j.service';
 
 /**
  * 所有异常过滤器
@@ -34,7 +34,7 @@ import { Log4JService } from '../service/log4j.service';
 export class AllExceptionFilter implements ExceptionFilter {
   private logger: Logger;
 
-  constructor(private readonly Log4js: Log4JService) {
+  constructor(private readonly Log4js: LoggerService) {
     this.logger = this.Log4js.getLogger(AllExceptionFilter.name);
   }
 

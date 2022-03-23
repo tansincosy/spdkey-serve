@@ -1,13 +1,12 @@
-import { Log4JService } from '@/common';
+import { LoggerService, Logger } from '@/common';
 import { Injectable } from '@nestjs/common';
-import { Logger } from 'log4js';
 import { DeviceDao } from '../dao/device.dao';
 import { DeviceDTO } from '../types/device';
 @Injectable()
 export class DeviceService {
   private logger: Logger;
   constructor(
-    private readonly loggerService: Log4JService,
+    private readonly loggerService: LoggerService,
     private readonly deviceDao: DeviceDao,
   ) {
     this.logger = this.loggerService.getLogger(DeviceService.name);

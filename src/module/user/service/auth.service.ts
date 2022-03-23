@@ -5,14 +5,13 @@ import {
   BaseException,
   BasicExceptionCode,
   HAS_VALID,
-  Log4JService,
+  LoggerService,
+  Logger,
   UserExceptionCode,
 } from '@/common';
-import { Logger } from 'log4js';
 import { AuthModelService } from './auth-model.service';
 import { UserDao } from '../dao/user.dao';
 import { CheckCode, ModifyParam } from '../types/controller.param';
-import { UserService } from './user.service';
 import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';
 import { CryptoConfig } from '@/config';
 @Injectable()
@@ -21,7 +20,7 @@ export class AuthService {
   constructor(
     private readonly modelService: AuthModelService,
     private readonly userDao: UserDao,
-    private readonly log4js: Log4JService,
+    private readonly log4js: LoggerService,
     private readonly configService: ConfigService,
   ) {
     this.logger = this.log4js.getLogger(AuthService.name);

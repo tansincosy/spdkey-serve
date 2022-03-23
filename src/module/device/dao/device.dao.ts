@@ -1,12 +1,12 @@
 import {
   DeviceLineStatus,
   DeviceLock,
-  Log4JService,
+  LoggerService,
   PrismaService,
+  Logger,
 } from '@/common';
 import { encryptedWithPbkdf2 } from '@/util';
 import { Injectable } from '@nestjs/common';
-import { Logger } from 'log4js';
 import { DeviceDTO } from '../types/device';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class DeviceDao {
   private logger: Logger;
   constructor(
     private readonly prismaService: PrismaService,
-    private log4js: Log4JService,
+    private log4js: LoggerService,
   ) {
     this.logger = this.log4js.getLogger(DeviceDao.name);
   }

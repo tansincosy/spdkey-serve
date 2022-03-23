@@ -7,12 +7,12 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Logger } from 'log4js';
-import { Log4JService } from '../service/log4j.service';
+import { LoggerService } from '../service/log4j.service';
 
 @Injectable()
 export class HttpSpendTimeInterceptor implements NestInterceptor {
   private log: Logger;
-  constructor(private readonly log4J: Log4JService) {
+  constructor(private readonly log4J: LoggerService) {
     this.log = log4J.getLogger('http');
   }
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {

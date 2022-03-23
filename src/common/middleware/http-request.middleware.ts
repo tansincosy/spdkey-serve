@@ -1,12 +1,12 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Logger } from 'log4js';
-import { Log4JService } from '../service/log4j.service';
+import { LoggerService } from '../service/log4j.service';
 @Injectable()
 export class HttpRequestMiddleware implements NestMiddleware {
   private log: Logger;
 
-  constructor(private readonly log4j: Log4JService) {
+  constructor(private readonly log4j: LoggerService) {
     this.log = this.log4j.getLogger('http');
   }
   use(req: Request, res: Response, next: () => void) {

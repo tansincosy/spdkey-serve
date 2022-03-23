@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Logger } from 'log4js';
 import {
   HAS_VALID,
-  Log4JService,
+  LoggerService,
   PrismaService,
   UserIsValid,
   UserLocked,
+  Logger,
 } from '@/common';
 import { RegisterParam } from '../types/controller.param';
 
@@ -14,7 +14,7 @@ export class UserDao {
   private logger: Logger;
   constructor(
     private readonly prismaService: PrismaService,
-    private log4js: Log4JService,
+    private log4js: LoggerService,
   ) {
     this.logger = this.log4js.getLogger(UserDao.name);
   }
