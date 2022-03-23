@@ -57,7 +57,7 @@ export const logConfig: Configuration = {
   categories: {
     default: {
       appenders: ['console', 'appLogFilter', 'errors'],
-      level: process.env.log || 'info',
+      level: process.env.app_log_level || 'info',
     },
     http: { appenders: ['access'], level: 'info' },
   },

@@ -9,7 +9,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new Log(logConfig),
   });
-  const log = app.get(LoggerService).getLogger(bootstrap.name);
   app.useGlobalFilters(new AllExceptionFilter(app.get(LoggerService)));
   app.useGlobalPipes(
     new ValidationPipe({
@@ -17,9 +16,9 @@ async function bootstrap() {
       enableDebugMessages: true,
     }),
   );
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.app_port || 3000);
   const banner = await readFileSync('banner.txt');
-  log.info(`
+  console.log(`
 ${banner}
 THE SERVER STARTED ON ${await app.getUrl()}
   `);
