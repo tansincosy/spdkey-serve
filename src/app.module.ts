@@ -20,8 +20,8 @@ import { CryptoConfig, EmailConfig, LoggerConfig } from './config';
     }),
     CacheModule.register({
       store,
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: +process.env.REDIS_PORT || 6379,
+      host: process.env.redis_host || '127.0.0.1',
+      port: +process.env.redis_prot || 6379,
       isGlobal: true,
     }),
     UserModule,

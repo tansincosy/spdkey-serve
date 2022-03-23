@@ -1,3 +1,4 @@
+import { BasicExceptionCode } from './../constant/error-code';
 import {
   ExceptionFilter,
   Catch,
@@ -52,19 +53,19 @@ export class AllExceptionFilter implements ExceptionFilter {
         break;
       case exception instanceof UnauthorizedException:
         response.status(HttpStatus.UNAUTHORIZED).json({
-          errorCode: 'MOV:' + exception.getStatus(),
+          errorCode: `${process.env.app_name}:` + exception.getStatus(),
           errorMessage: exception.message,
         });
         break;
       case exception instanceof BaseException:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:' + exception.getStatus(),
+          errorCode: `${process.env.app_name}:` + exception.getStatus(),
           errorMessage: exception.getResponse(),
         });
         break;
       case exception instanceof BadRequestException:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:601001',
+          errorCode: `${process.env.app_name}:601001`,
           errorMessage: `${exception?.response?.message}`,
         });
         break;
@@ -96,50 +97,50 @@ export class AllExceptionFilter implements ExceptionFilter {
     switch (true) {
       case exception instanceof UnauthorizedRequestError:
         response.status(HttpStatus.UNAUTHORIZED).json({
-          errorCode: 'MOV:1',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.UNAUTHORIZED_REQUEST}`,
           errorMessage: exception.message,
         });
         break;
       case exception instanceof InvalidClientError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:2',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.CLIENT_INVALID}`,
           errorMessage: exception.message,
         });
         break;
       case exception instanceof UnsupportedGrantTypeError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:3',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.UN_SUPPORT_GRANT_TYPE}`,
           errorMessage: exception.message,
         });
         break;
       case exception instanceof InvalidScopeError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:4',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.SCOPE_INVALID}`,
           errorMessage: exception.message,
         });
         break;
       case exception instanceof InvalidRequestError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:5',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.INVALID_REQUEST_ERROR}`,
           errorMessage: exception.message,
         });
         break;
       case exception instanceof UnauthorizedClientError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:6',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.UNAUTHORIZED_REQUEST}`,
           errorMessage: exception.message,
         });
         break;
       case exception instanceof InvalidTokenError:
         response.status(HttpStatus.BAD_REQUEST).json({
-          errorCode: 'MOV:7',
+          errorCode: `${process.env.app_name}:${BasicExceptionCode.TOKEN_INVALID}`,
           errorMessage: exception.message,
         });
         break;
       default:
         if (exception.status === 503) {
           response.status(HttpStatus.UNAUTHORIZED).json({
-            errorCode: 'MOV:' + exception.inner.status,
+            errorCode: `${process.env.app_name}` + exception.inner.status,
             errorMessage: exception.message,
           });
         }
