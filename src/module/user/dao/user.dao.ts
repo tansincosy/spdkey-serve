@@ -125,4 +125,16 @@ export class UserDao {
       },
     });
   }
+
+  async findUserById(userId: string) {
+    return await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        username: true,
+      },
+    });
+  }
 }

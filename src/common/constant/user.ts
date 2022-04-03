@@ -9,3 +9,9 @@ export enum UserIsValid {
 }
 
 export const HAS_VALID = 'HAS_BEEN_VALIDATE';
+
+export const TOKEN_FORMAT = {
+  client: 'clients:%s',
+  token: 'tokens:%s',
+  user: 'users:%s',
+};

@@ -17,7 +17,7 @@ async function bootstrap() {
     }),
   );
   await app.listen(process.env.app_port || 3000);
-  const banner = await readFileSync('banner.txt');
+  const banner = readFileSync('banner.txt');
   console.log(`
 ${banner}
 THE SERVER STARTED ON ${await app.getUrl()}

@@ -5,8 +5,9 @@ import {
   BasicExceptionCode,
   UserExceptionCode,
   Logger,
+  TOKEN_FORMAT,
 } from '@/common';
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UserDao } from '../dao/user.dao';
 import { RegisterParam } from '../types/controller.param';
 import * as nodemailer from 'nodemailer';
@@ -16,6 +17,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { encrypt, encryptedWithPbkdf2, generateTemplateString } from '@/util';
 import { CryptoConfig } from '@/config';
+import { Request, Response } from 'express';
+import { Cache } from 'cache-manager';
+import { Token } from 'oauth2-server';
+import { format } from 'util';
 
 @Injectable()
 export class UserService {
@@ -24,6 +29,8 @@ export class UserService {
     private readonly loggerService: LoggerService,
     private userDao: UserDao,
     private readonly configService: ConfigService,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {
     this.log = this.loggerService.getLogger(UserService.name);
   }
@@ -179,5 +186,28 @@ export class UserService {
     return {
       id: user.id,
     };
+  }
+
+  async getCurrentUser(req: Request, resp: Response) {
+    const headers = req.headers;
+    const token = headers.authorization;
+    if (token) {
+      const [, tokenStr] = token.split(' ');
+      const getAccessTokenValue = await this.cacheManager.get<Token>(
+        format(TOKEN_FORMAT.token, tokenStr),
+      );
+      if (getAccessTokenValue) {
+        this.log.debug('getAccessTokenValue = ', getAccessTokenValue);
+        const {
+          user: { id },
+        } = getAccessTokenValue;
+        return this.userDao.findUserById(id);
+      } else {
+        this.log.warn('[getCurrentUser] getAccessTokenValue is null');
+      }
+    } else {
+      this.log.warn('[getCurrentUser] token is null');
+    }
+    resp.status(HttpStatus.OK).json({});
   }
 }
