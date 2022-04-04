@@ -4,9 +4,11 @@ import {
   LoggerService,
   PrismaService,
   Logger,
+  PageInfoNumber,
 } from '@/common';
 import { encryptedWithPbkdf2 } from '@/util';
 import { Injectable } from '@nestjs/common';
+import { Device } from '@prisma/client';
 import { DeviceDTO } from '../types/device';
 
 @Injectable()
@@ -142,5 +144,86 @@ export class DeviceDao {
       skipDuplicates: true,
     });
     this.logger.info('[saveGrantOnDevice] save grant on device successfully!!');
+  }
+
+  async updateDevice(device: DeviceDTO) {
+    const result = this.prismaService.device.update({
+      data: {
+        isOnline: device.isOnline,
+        os: device.os,
+        engine: device.engine,
+        accessTokenValidateSeconds: device.accessTokenValidateSeconds,
+        refreshTokenValidateSeconds: device.refreshTokenValidateSeconds,
+      },
+      where: {
+        id: device.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    this.logger.info('[updateDevice] updateDevice device successfully!!');
+    return result;
+  }
+
+  async getDeviceById(id: string) {
+    this.logger.info('[getDeviceById] id = %s', id);
+    const deviceInfo = await this.prismaService.device.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        grants: {
+          select: {
+            grant: true,
+          },
+        },
+      },
+    });
+    this.logger.info('[getDeviceById] getDeviceById successfully!!');
+    return deviceInfo;
+  }
+
+  async getDeviceListForPage(
+    pageSize: string,
+    current: string,
+  ): Promise<PageInfoNumber<Device[]>> {
+    const [data, total] = await this.prismaService.$transaction([
+      this.prismaService.device.findMany({
+        take: +pageSize,
+        skip: +current - 1,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prismaService.device.count(),
+    ]);
+    return {
+      total,
+      data,
+      pageSize: +pageSize,
+      pageNumber: +current,
+    };
+  }
+
+  async batchDeleteDevice(deviceIdObj: { ids: string[] }) {
+    await this.prismaService.$transaction([
+      this.prismaService.grantOnDevice.deleteMany({
+        where: {
+          deviceId: {
+            in: deviceIdObj.ids,
+          },
+        },
+      }),
+      this.prismaService.device.deleteMany({
+        where: {
+          id: {
+            in: deviceIdObj.ids,
+          },
+        },
+      }),
+    ]);
+    this.logger.info('[batchDeleteDevice] batchDeleteDevice successfully!!');
+    return {};
   }
 }

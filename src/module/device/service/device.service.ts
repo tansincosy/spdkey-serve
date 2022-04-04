@@ -1,7 +1,7 @@
-import { LoggerService, Logger } from '@/common';
+import { LoggerService, Logger, PageInfoNumber } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { DeviceDao } from '../dao/device.dao';
-import { DeviceDTO } from '../types/device';
+import { DeviceDTO, QueryDeviceDTO } from '../types/device';
 @Injectable()
 export class DeviceService {
   private logger: Logger;
@@ -33,5 +33,35 @@ export class DeviceService {
     await this.deviceDao.saveGrantOnDevice(id, ...grantIds);
 
     return { deviceSecret };
+  }
+
+  async updateDevice(device: DeviceDTO) {
+    return this.deviceDao.updateDevice(device);
+  }
+
+  async getList({
+    pageSize,
+    current,
+    id,
+  }: QueryDeviceDTO): Promise<
+    DeviceDTO | DeviceDTO[] | PageInfoNumber<DeviceDTO[]>
+  > {
+    if (id) {
+      this.logger.info('[get]::: findUnique ');
+      const foundDevice = await this.deviceDao.getDeviceById(id);
+      return {
+        ...foundDevice,
+        grants: foundDevice.grants.map(({ grant }) => grant.name),
+      };
+    }
+
+    this.logger.info('[get]::: enter');
+    return this.deviceDao.getDeviceListForPage(pageSize, current);
+  }
+
+  async delete(ids: { ids: string[] }) {
+    this.logger.info('[delete]::: ids :::', ids.ids);
+    await this.deviceDao.batchDeleteDevice(ids);
+    return {};
   }
 }

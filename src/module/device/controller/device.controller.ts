@@ -1,7 +1,16 @@
 import { AuthGuard } from '@/module/user';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { DeviceService } from '../service/device.service';
-import { DeviceDTO } from '../types/device';
+import { DeviceDTO, QueryDeviceDTO } from '../types/device';
 
 @Controller('device')
 export class DeviceController {
@@ -12,9 +21,20 @@ export class DeviceController {
     return this.deviceService.saveDevice(client);
   }
 
-  @Get('/private')
+  @Put()
+  updateClient(@Body() client: DeviceDTO) {
+    return this.deviceService.updateDevice(client);
+  }
+
+  @Get()
   @UseGuards(AuthGuard)
-  getPrivateDate() {
-    return 'private data';
+  getClient(@Query() { current, pageSize, id }: QueryDeviceDTO) {
+    return this.deviceService.getList({ current, pageSize, id });
+  }
+
+  @Delete()
+  @UseGuards(AuthGuard)
+  deleteClient(@Body() { ids }: { ids: string[] }) {
+    return this.deviceService.delete({ ids });
   }
 }

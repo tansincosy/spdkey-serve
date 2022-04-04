@@ -1,6 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class DeviceDTO {
+  @IsNumber()
+  isOnline?: number;
+  @IsNumber()
+  isLocked?: number;
+  id?: string;
   @IsString()
   readonly deviceId: string;
   @IsString()
@@ -11,4 +16,19 @@ export class DeviceDTO {
   readonly type: string;
   @IsString()
   readonly engine: string;
+  deviceSecret?: string;
+  grants?: string[];
+  @IsNumber()
+  accessTokenValidateSeconds?: number;
+  @IsNumber()
+  refreshTokenValidateSeconds?: number;
+}
+
+export class QueryDeviceDTO {
+  @IsString()
+  current?: string;
+  @IsString()
+  pageSize?: string;
+  @IsString()
+  id?: string;
 }
