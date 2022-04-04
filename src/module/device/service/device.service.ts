@@ -1,7 +1,7 @@
-import { LoggerService, Logger, PageInfoNumber } from '@/common';
+import { LoggerService, Logger, PageInfoNumber, QueryParams } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { DeviceDao } from '../dao/device.dao';
-import { DeviceDTO, QueryDeviceDTO } from '../types/device';
+import { DeviceDTO } from '../types/device';
 @Injectable()
 export class DeviceService {
   private logger: Logger;
@@ -43,7 +43,7 @@ export class DeviceService {
     pageSize,
     current,
     id,
-  }: QueryDeviceDTO): Promise<
+  }: QueryParams): Promise<
     DeviceDTO | DeviceDTO[] | PageInfoNumber<DeviceDTO[]>
   > {
     if (id) {

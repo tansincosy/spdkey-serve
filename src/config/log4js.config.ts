@@ -3,6 +3,13 @@ import { Configuration } from 'log4js';
 
 export const logConfig: Configuration = {
   appenders: {
+    logstash: {
+      type: '@log4js-node/logstash-http',
+      url: 'http://localhost:3000/logger',
+      application: 'logstash-log4js',
+      logType: 'application',
+      logChannel: 'node',
+    },
     console: {
       type: 'console',
       layout: {

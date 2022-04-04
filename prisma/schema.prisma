@@ -104,3 +104,25 @@ model Device {
   userId String?
   @@map("zap_tb_device")
 }
+
+model Config {
+  id        String   @id @default(uuid())
+  name      String   @unique @default("")
+  value     String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  introduce String?  @default("")
+
+  ConfigType   ConfigType? @relation(fields: [configTypeId], references: [id])
+  configTypeId String?     @map("type_id")
+
+  @@map("zap_tb_config")
+}
+
+model ConfigType {
+  id      String   @id @default(uuid())
+  name    String   @unique @default("")
+  configs Config[]
+
+  @@map("zap_tb_config_type")
+}

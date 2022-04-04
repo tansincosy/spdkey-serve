@@ -23,12 +23,3 @@ export class DeviceDTO {
   @IsNumber()
   refreshTokenValidateSeconds?: number;
 }
-
-export class QueryDeviceDTO {
-  @IsString()
-  current?: string;
-  @IsString()
-  pageSize?: string;
-  @IsString()
-  id?: string;
-}

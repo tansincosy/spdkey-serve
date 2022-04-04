@@ -7,3 +7,4 @@ export * from './constant';
 export * from './exception/message.exception';
 export * from './service/prisma.service';
 export * from './middleware/http-request.middleware';
+export * from './common.module';
