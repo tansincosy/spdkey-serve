@@ -1,7 +1,11 @@
-import { BasicExceptionCode, UserExceptionCode } from '../constant';
+import {
+  BasicExceptionCode,
+  UserExceptionCode,
+  TMDBErrorCode,
+} from '../constant';
 
 export const BasicException = new Map<
-  BasicExceptionCode | UserExceptionCode,
+  BasicExceptionCode | UserExceptionCode | TMDBErrorCode,
   string
 >([
   [BasicExceptionCode.CLIENT_IS_ILLEGAL, 'Invalid client: illegal device'],
@@ -42,4 +46,9 @@ export const BasicException = new Map<
   [UserExceptionCode.FORGOT_PASS_TO_MAIL_CODE_FAILED, 'user is not exist!'],
   [UserExceptionCode.VERIFY_CODE_ERROR, "user's verify code is incorrect"],
   [BasicExceptionCode.UPDATE_PASSWORD_FAILED, 'change password failed'],
+
+  [TMDBErrorCode.CONNECTED_ERROR, 'tmdb:: Connect error'],
+  [TMDBErrorCode.INVALID_API, 'TMDB::Invalid API Key Error'],
+  [TMDBErrorCode.SOURCE_NOT_FOUND, 'TMDB:: source not found'],
+  [TMDBErrorCode.SERVER_ERROR, 'TMDB:: server Invalid'],
 ]);

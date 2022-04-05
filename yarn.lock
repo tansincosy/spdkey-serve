@@ -580,6 +580,13 @@
     axios "^0.21.1"
     debug "^3.1.0"
 
+"@nestjs/axios@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.npmmirror.com/@nestjs/axios/-/axios-0.0.7.tgz#7f134636db13c2c1e8299365c7eceb73cd782b67"
+  integrity sha512-at8nj+1Nb8UleHcIN5QqZYeWX54m4m9s9gxzVE1qWy00neX2rg0+h2TfbWsnDi2tc23zIxqexanxMOJZbzO0CA==
+  dependencies:
+    axios "0.26.0"
+
 "@nestjs/cli@^8.0.0":
   version "8.2.2"
   resolved "https://registry.npmmirror.com/@nestjs/cli/-/cli-8.2.2.tgz#26d6a4d41f87f8c88d4c299837a2df95e4dca205"
