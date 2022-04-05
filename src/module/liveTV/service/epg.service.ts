@@ -1,7 +1,8 @@
 import { Logger, LoggerService } from '@/common';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-
+import fs from 'fs';
+import { lastValueFrom, map } from 'rxjs';
 @Injectable()
 export class EPGService {
   private log: Logger;
@@ -14,6 +15,16 @@ export class EPGService {
 
   async downEpgXMLFrom3rd() {
     const downloadEpgUrl = process.env.epg_xml_download_url as string;
-    const downloadSources = await this.httpService.get(downloadEpgUrl);
+    this.log.info('[downEpgXMLFrom3rd] downloadEpgUrl>>>', downloadEpgUrl);
+    const downloadObservable = this.httpService
+      .request({
+        method: 'GET',
+        url: downloadEpgUrl,
+        responseType: 'stream',
+      })
+      .pipe(map((resp) => resp.data));
+    const downloadData = await lastValueFrom(downloadObservable);
+    downloadData.pipe(fs.createWriteStream('./epg.xml'));
+    this.log.info('[downEpgXMLFrom3rd] download successfully >>>');
   }
 }
