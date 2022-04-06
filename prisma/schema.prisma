@@ -126,3 +126,41 @@ model ConfigType {
 
   @@map("zap_tb_config_type")
 }
+
+model Channel {
+  id        String    @id @default(uuid())
+  name      String    @unique @default("")
+  channelId String?   @default("") @map("channel_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  introduce String?   @db.Text
+  playUrl   PlayUrl[]
+  programs  Program[]
+
+  @@map("zap_tb_channel")
+}
+
+model PlayUrl {
+  id        String   @id @default(uuid())
+  name      String   @unique @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId String?  @map("channel_id")
+
+  @@map("zap_tb_playurl")
+}
+
+model Program {
+  id        String  @id @default(uuid())
+  name      String  @unique @default("")
+  introduce String? @db.Text
+
+  startTime String @map("start_time") @db.Text
+  endTime   String @map("end_time") @db.Text
+
+  Channel   Channel? @relation(fields: [channelId], references: [id])
+  channelId String?  @map("channel_id")
+  @@map("zap_tb_program")
+}
