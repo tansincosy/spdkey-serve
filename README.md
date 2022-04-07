@@ -23,7 +23,7 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
-## T 测试
+## 测试
 
 ```bash
 # unit tests
