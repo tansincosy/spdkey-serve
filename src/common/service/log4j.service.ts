@@ -5,7 +5,7 @@ import { Configuration } from 'log4js';
 
 @Injectable()
 export class LoggerService extends Log {
-  constructor(private readonly configService: ConfigService) {
+  constructor(configService: ConfigService) {
     super(configService.get<Configuration>('logger'));
   }
 }

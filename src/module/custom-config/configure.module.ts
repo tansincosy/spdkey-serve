@@ -1,11 +1,11 @@
 import { UserModule } from './../user/user.module';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigureController } from './configure.controller';
 import { ConfigureService } from './configure.service';
 import { ConfigureDao } from './configure.dao';
 
 @Module({
-  imports: [UserModule],
+  imports: [forwardRef(() => UserModule)],
   controllers: [ConfigureController],
   providers: [ConfigureService, ConfigureDao],
 })

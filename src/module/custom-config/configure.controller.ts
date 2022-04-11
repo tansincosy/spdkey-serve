@@ -18,7 +18,7 @@ export class ConfigureController {
   constructor(private readonly configService: ConfigureService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   getConfig(@Query() query: QueryParams) {
     return this.configService.get(query);
   }

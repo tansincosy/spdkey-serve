@@ -1,13 +1,14 @@
-import { LoggerService, PageInfoNumber, PrismaService } from '@/common';
-import { Logger } from 'log4js';
+import { Injectable } from '@nestjs/common';
+import { LoggerService, PageInfoNumber, PrismaService, Logger } from '@/common';
 import isEmpty from 'lodash/isEmpty';
 import { Config } from './configure.dto';
 
+@Injectable()
 export class ConfigureDao {
   private logger: Logger;
   constructor(
     private readonly prismaService: PrismaService,
-    private log: LoggerService,
+    private readonly log: LoggerService,
   ) {
     this.logger = this.log.getLogger(ConfigureDao.name);
   }

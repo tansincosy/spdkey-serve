@@ -4,7 +4,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as store from 'cache-manager-redis-store';
 import { CryptoConfig, EmailConfig, LoggerConfig } from '@/config';
-import { AuthModule, DeviceModule, UserModule } from '@/module';
+import {
+  AuthModule,
+  ConfigureModule,
+  DeviceModule,
+  UserModule,
+} from '@/module';
 import { CommonModule, HttpRequestMiddleware } from '@/common';
 
 @Module({
@@ -25,6 +30,7 @@ import { CommonModule, HttpRequestMiddleware } from '@/common';
     UserModule,
     DeviceModule,
     AuthModule,
+    ConfigureModule,
     // LoggerModule,
   ],
   controllers: [AppController],
