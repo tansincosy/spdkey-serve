@@ -1,5 +1,4 @@
 import { QueryParams } from '@/common';
-import { AuthGuard } from '@/module/user';
 import {
   Body,
   Controller,
@@ -10,8 +9,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { DeviceService } from '../service/device.service';
-import { DeviceDTO } from '../types/device';
+import { AuthGuard } from '../auth/auth.guard';
+import { DeviceDTO } from './device.dto';
+import { DeviceService } from './device.service';
 
 @Controller('device')
 export class DeviceController {
@@ -34,7 +34,7 @@ export class DeviceController {
   }
 
   @Delete()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   deleteClient(@Body() { ids }: { ids: string[] }) {
     return this.deviceService.delete({ ids });
   }

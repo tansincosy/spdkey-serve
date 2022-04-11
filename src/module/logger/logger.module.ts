@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { LoggerController } from './controller/logger.controller';
-import { LoggerDao } from './dao/logger.dao';
-import { LoggerService } from './service/logger.service';
+import { LoggerController } from './logger.controller';
+import { LoggerDao } from './logger.dao';
+import { LoggerService } from './logger.service';
 
 @Module({
   controllers: [LoggerController],

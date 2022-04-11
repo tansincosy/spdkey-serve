@@ -1,6 +1,6 @@
 import { DeleteIdPrams, QueryParams } from '@/common';
 import { Injectable } from '@nestjs/common';
-import { LoggerDao } from '../dao/logger.dao';
+import { LoggerDao } from './logger.dao';
 
 @Injectable()
 export class LoggerService {

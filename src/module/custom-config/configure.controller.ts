@@ -1,5 +1,4 @@
 import { QueryParams } from '@/common';
-import { AuthGuard } from '@/module/user';
 import {
   Body,
   Controller,
@@ -10,8 +9,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigureService } from '../service/configure.service';
-import { Config, DeleteIdPrams } from '../types/config';
+import { AuthGuard } from '../auth/auth.guard';
+import { Config, DeleteIdPrams } from './configure.dto';
+import { ConfigureService } from './configure.service';
 
 @Controller('config')
 export class ConfigureController {

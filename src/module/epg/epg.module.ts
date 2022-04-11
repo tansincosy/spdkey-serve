@@ -1,9 +1,9 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { EPGService } from './service/epg.service';
+import { EPGService } from './epg.service';
 
 @Module({
   imports: [HttpModule],
   providers: [EPGService],
 })
-export class LiveTVModule {}
+export class EPGModule {}

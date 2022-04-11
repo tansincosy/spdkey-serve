@@ -1,8 +1,8 @@
 import { UserModule } from './../user/user.module';
 import { Module } from '@nestjs/common';
-import { ConfigureService } from './service/configure.service';
-import { ConfigureController } from './controller/configure.controller';
-import { ConfigureDao } from './dao/configure.dao';
+import { ConfigureController } from './configure.controller';
+import { ConfigureService } from './configure.service';
+import { ConfigureDao } from './configure.dao';
 
 @Module({
   imports: [UserModule],

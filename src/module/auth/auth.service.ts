@@ -1,19 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import * as OAuth2 from 'oauth2-server';
-import {
-  BaseException,
-  BasicExceptionCode,
-  HAS_VALID,
-  LoggerService,
-  Logger,
-  UserExceptionCode,
-} from '@/common';
+import { BaseException, LoggerService, Logger } from '@/common';
 import { AuthModelService } from './auth-model.service';
-import { UserDao } from '../dao/user.dao';
-import { CheckCode, ModifyParam } from '../types/controller.param';
 import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';
 import { CryptoConfig } from '@/config';
+import { UserDao } from '../user/user.dao';
+import { BasicExceptionCode, HAS_VALID, UserExceptionCode } from '@/constant';
+import { CheckCode, ModifyParam } from '../user/user.dto';
 @Injectable()
 export class AuthService {
   private logger: Logger;

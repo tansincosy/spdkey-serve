@@ -1,4 +1,3 @@
-import { AuthModelService } from './../service/auth-model.service';
 import {
   Body,
   Controller,
@@ -10,9 +9,10 @@ import {
   Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from '../service/auth.service';
 import * as OAuth2 from 'oauth2-server';
-import { CheckCode, ModifyParam } from '../types/controller.param';
+import { CheckCode, ModifyParam } from '../user/user.dto';
+import { AuthModelService } from './auth-model.service';
+import { AuthService } from './auth.service';
 @Controller('auth')
 export class AuthController {
   constructor(

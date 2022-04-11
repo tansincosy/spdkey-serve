@@ -1,15 +1,9 @@
-import {
-  DeviceLineStatus,
-  DeviceLock,
-  LoggerService,
-  PrismaService,
-  Logger,
-  PageInfoNumber,
-} from '@/common';
+import { LoggerService, PrismaService, Logger, PageInfoNumber } from '@/common';
+import { DeviceLineStatus, DeviceLock } from '@/constant';
 import { encryptedWithPbkdf2 } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { Device } from '@prisma/client';
-import { DeviceDTO } from '../types/device';
+import { DeviceDTO } from './device.dto';
 
 @Injectable()
 export class DeviceDao {

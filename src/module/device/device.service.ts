@@ -1,7 +1,8 @@
 import { LoggerService, Logger, PageInfoNumber, QueryParams } from '@/common';
 import { Injectable } from '@nestjs/common';
-import { DeviceDao } from '../dao/device.dao';
-import { DeviceDTO } from '../types/device';
+import { DeviceDao } from './device.dao';
+import { DeviceDTO } from './device.dto';
+
 @Injectable()
 export class DeviceService {
   private logger: Logger;

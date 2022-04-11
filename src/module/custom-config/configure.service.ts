@@ -1,4 +1,3 @@
-import { ConfigureDao } from './../dao/configure.dao';
 import { Logger } from 'log4js';
 import { Injectable } from '@nestjs/common';
 import {
@@ -7,7 +6,8 @@ import {
   PageInfoNumber,
   QueryParams,
 } from '@/common';
-import { Config } from '../types/config';
+import { ConfigureDao } from './configure.dao';
+import { Config } from './configure.dto';
 
 @Injectable()
 export class ConfigureService {

@@ -1,5 +1,4 @@
 import { DeleteIdPrams, QueryParams } from '@/common';
-import { AuthGuard } from '@/module/user';
 import {
   Body,
   Controller,
@@ -9,7 +8,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { LoggerService } from '../service/logger.service';
+import { AuthGuard } from '../auth/auth.guard';
+import { LoggerService } from './logger.service';
 
 @Controller('logger')
 export class LoggerController {

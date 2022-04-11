@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
-import { UserService } from '../service/user.service';
-import { RegisterParam } from '../types/controller.param';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
+import { AuthGuard } from '../auth/auth.guard';
+import { RegisterParam } from './user.dto';
+import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -16,6 +26,7 @@ export class UserController {
   }
 
   @Get('/current-user')
+  @UseGuards(AuthGuard)
   getCurrentUser(@Req() req: Request, @Res() resp: Response) {
     return this.userService.getCurrentUser(req, resp);
   }

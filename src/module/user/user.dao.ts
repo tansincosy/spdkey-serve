@@ -1,13 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import {
-  HAS_VALID,
-  LoggerService,
-  PrismaService,
-  UserIsValid,
-  UserLocked,
-  Logger,
-} from '@/common';
-import { RegisterParam } from '../types/controller.param';
+import { LoggerService, PrismaService, Logger } from '@/common';
+import { RegisterParam } from './user.dto';
+import { HAS_VALID, UserIsValid, UserLocked } from '@/constant';
 
 @Injectable()
 export class UserDao {

@@ -1,7 +1,7 @@
 import { LoggerService, PageInfoNumber, PrismaService } from '@/common';
 import { Logger } from 'log4js';
 import isEmpty from 'lodash/isEmpty';
-import { Config } from '../types/config';
+import { Config } from './configure.dto';
 
 export class ConfigureDao {
   private logger: Logger;

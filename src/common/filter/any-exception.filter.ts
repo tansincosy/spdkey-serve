@@ -1,4 +1,3 @@
-import { BasicExceptionCode } from './../constant/error-code';
 import {
   ExceptionFilter,
   Catch,
@@ -27,6 +26,7 @@ import {
 import { BaseException } from '../exception/base.exception';
 import { Logger } from 'log4js';
 import { LoggerService } from '../service/log4j.service';
+import { BasicExceptionCode } from '@/constant';
 
 /**
  * 所有异常过滤器

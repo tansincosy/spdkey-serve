@@ -1,15 +1,6 @@
 import { isEmpty } from 'lodash';
-import {
-  BaseException,
-  LoggerService,
-  BasicExceptionCode,
-  UserExceptionCode,
-  Logger,
-  TOKEN_FORMAT,
-} from '@/common';
+import { BaseException, LoggerService, Logger } from '@/common';
 import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { UserDao } from '../dao/user.dao';
-import { RegisterParam } from '../types/controller.param';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
@@ -21,16 +12,23 @@ import { Request, Response } from 'express';
 import { Cache } from 'cache-manager';
 import { Token } from 'oauth2-server';
 import { format } from 'util';
+import { UserDao } from './user.dao';
+import { RegisterParam } from './user.dto';
+import {
+  BasicExceptionCode,
+  TOKEN_FORMAT,
+  UserExceptionCode,
+} from '@/constant';
 
 @Injectable()
 export class UserService {
   private log: Logger;
   constructor(
     private readonly loggerService: LoggerService,
-    private userDao: UserDao,
+    private readonly userDao: UserDao,
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER)
-    private cacheManager: Cache,
+    private readonly cacheManager: Cache,
   ) {
     this.log = this.loggerService.getLogger(UserService.name);
   }

@@ -1,10 +1,4 @@
-import {
-  BaseException,
-  BasicExceptionCode,
-  Logger,
-  LoggerService,
-  UserLocked,
-} from '@/common';
+import { BaseException, Logger, LoggerService } from '@/common';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
@@ -18,14 +12,15 @@ import OAuth2Server, {
   Token,
   User,
 } from 'oauth2-server';
-import { DeviceDao } from '@/module/device/dao/device.dao';
 import { isEmpty } from 'lodash';
 import { sign } from 'jsonwebtoken';
 import { format } from 'util';
 import { decrypt, secretMask, atob } from '@/util';
 import { CryptoConfig } from '@/config';
-import { UserDao } from '../dao/user.dao';
 import { Request } from 'express';
+import { DeviceDao } from '../device/device.dao';
+import { UserDao } from '../user/user.dao';
+import { BasicExceptionCode, UserLocked } from '@/constant';
 
 enum DeviceStatus {
   LOCKED = 1,
