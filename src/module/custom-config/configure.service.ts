@@ -1,11 +1,6 @@
 import { Logger } from 'log4js';
 import { Injectable } from '@nestjs/common';
-import {
-  LoggerService,
-  PrismaService,
-  PageInfoNumber,
-  QueryParams,
-} from '@/common';
+import { LoggerService, PageInfoNumber, QueryParams } from '@/common';
 import { ConfigureDao } from './configure.dao';
 import { Config } from './configure.dto';
 
@@ -14,7 +9,6 @@ export class ConfigureService {
   private logger: Logger;
   constructor(
     private log: LoggerService,
-    private readonly prismaService: PrismaService,
     private readonly configDao: ConfigureDao,
   ) {
     this.logger = this.log.getLogger(ConfigureService.name);
