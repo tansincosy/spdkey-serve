@@ -148,13 +148,17 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
   }
 
   async getUser(username: string, password: string): Promise<User | Falsey> {
+    this.logger.info('get  user pass from db');
     const user = await this.userDao.findUserByName(username);
     if (isEmpty(user)) {
-      this.logger.warn('[getUser] user is empty');
+      this.logger.warn('find user is empty');
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }
     const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
-    this.logger.info('[getUser] cryptoConfig = ', cryptoConfig.encryptedKey);
+    this.logger.debug(
+      '[getUser] cryptoConfig encryptedKey = ',
+      secretMask(cryptoConfig.encryptedKey),
+    );
     const decryptPassword = decrypt(cryptoConfig.encryptedKey, user.password);
     this.logger.debug('[getUser] dePass = %s', secretMask(decryptPassword));
     if (password !== decryptPassword) {
@@ -179,12 +183,8 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     scope: string,
   ): Promise<string | false | 0 | string[]> {
     this.logger.info('[validateScope] enter');
-    this.logger.debug(
-      '[validateScope] [user] = %s , [client] = %s  [scope] = %s',
-      user,
-      client,
-      scope,
-    );
+    this.logger.debug('[validateScope] user = %s', user.scope);
+    this.logger.debug('[client] = %s  [scope] = %s', user, client, scope);
     if (!scope) {
       throw new BaseException(BasicExceptionCode.SCOPE_INVALID);
     }

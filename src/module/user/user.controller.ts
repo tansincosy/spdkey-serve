@@ -28,6 +28,6 @@ export class UserController {
   @Get('/current-user')
   @UseGuards(AuthGuard)
   getCurrentUser(@Req() req: Request, @Res() resp: Response) {
-    return this.userService.getCurrentUser(req, resp);
+    this.userService.getCurrentUser(req, resp);
   }
 }

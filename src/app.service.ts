@@ -8,11 +8,6 @@ export class AppService {
     this.logger = loggerService.getLogger(AppService.name);
   }
   getHello(): string {
-    // this.logger.info('sss %s', 'ssss');
-    this.logger.info('ssss %s', 'sss');
-    this.logger.debug('ccc', 'ccc');
-    this.logger.error('sssss');
-    this.logger.warn('cccc');
     return 'Hello World!';
   }
 }

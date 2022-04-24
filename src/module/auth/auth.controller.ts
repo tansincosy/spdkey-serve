@@ -13,7 +13,7 @@ import * as OAuth2 from 'oauth2-server';
 import { CheckCode, ModifyParam } from '../user/user.dto';
 import { AuthModelService } from './auth-model.service';
 import { AuthService } from './auth.service';
-@Controller('auth')
+@Controller('oauth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

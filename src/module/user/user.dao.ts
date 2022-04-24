@@ -121,6 +121,8 @@ export class UserDao {
   }
 
   async findUserById(userId: string) {
+    this.logger.info('[findUserById] enter');
+    this.logger.debug('updateUserMailCode userId = ', userId);
     return await this.prismaService.user.findUnique({
       where: {
         id: userId,

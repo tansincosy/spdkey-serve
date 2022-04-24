@@ -19,4 +19,12 @@ function main {
 
 }
 
+function check_node_environment() {
+    echo "$1" # arguments are accessible through $1, $2,...
+}
+
+function make_app_file() {
+    echo "$1" # arguments are accessible through $1, $2,...
+}
+
 main

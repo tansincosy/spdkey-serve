@@ -189,6 +189,7 @@ export class UserService {
   async getCurrentUser(req: Request, resp: Response) {
     const headers = req.headers;
     const token = headers.authorization;
+    let findUserResult = {};
     if (token) {
       const [, tokenStr] = token.split(' ');
       const getAccessTokenValue = await this.cacheManager.get<Token>(
@@ -196,16 +197,15 @@ export class UserService {
       );
       if (getAccessTokenValue) {
         this.log.debug('getAccessTokenValue = ', getAccessTokenValue);
-        const {
-          user: { id },
-        } = getAccessTokenValue;
-        return this.userDao.findUserById(id);
+        const { userId } = getAccessTokenValue;
+        findUserResult = this.userDao.findUserById(userId);
       } else {
         this.log.warn('[getCurrentUser] getAccessTokenValue is null');
       }
     } else {
       this.log.warn('[getCurrentUser] token is null');
     }
-    resp.status(HttpStatus.OK).json({});
+
+    resp.status(HttpStatus.OK).json(findUserResult);
   }
 }

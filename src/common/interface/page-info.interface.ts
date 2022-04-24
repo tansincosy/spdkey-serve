@@ -1,6 +1,6 @@
 export interface PageInfoNumber<T> {
   pageNumber: number;
   pageSize: number;
-  data?: T;
+  data: T;
   total: number;
 }
