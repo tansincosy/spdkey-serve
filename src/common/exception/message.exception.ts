@@ -51,4 +51,6 @@ export const BasicException = new Map<
   [TMDBErrorCode.INVALID_API, 'TMDB::Invalid API Key Error'],
   [TMDBErrorCode.SOURCE_NOT_FOUND, 'TMDB:: source not found'],
   [TMDBErrorCode.SERVER_ERROR, 'TMDB:: server Invalid'],
+  [BasicExceptionCode.DOWNLOAD_FILE_FAILED, 'download file failed'],
+  [BasicExceptionCode.DOWNLOAD_FILE_TYPE_ERROR, 'download file type error'],
 ]);
