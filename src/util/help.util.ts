@@ -162,3 +162,10 @@ export function encryptedWithPbkdf2(userPassword: string): Promise<string> {
     });
   });
 }
+
+export function arrayHasItem(param: any): boolean {
+  if (Array.isArray(param)) {
+    return param.length > 0;
+  }
+  return false;
+}

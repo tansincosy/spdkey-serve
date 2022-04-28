@@ -1,11 +1,18 @@
-import { ChannelConstant, ChannelReg } from './../../constant/channel.constant';
 import { ParseUrlDTO } from './channel.dto';
 import { Logger, LoggerService, BaseException } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
 import { FileManagerService } from './file-manager.service';
-import { BasicExceptionCode } from '@/constant';
+import { BasicExceptionCode, ChannelConstant, ChannelReg } from '@/constant';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { existsSync, readdirSync } from 'fs';
+import { ChannelSource } from '@prisma/client';
+import { arrayHasItem } from '@/util';
+import { XMLParser } from 'fast-xml-parser';
+import { isObject } from 'lodash';
 
+const execPromise = promisify(exec);
 @Injectable()
 export class ChannelService {
   private logger: Logger;
@@ -22,17 +29,46 @@ export class ChannelService {
     const targetFileName = `./tmp/channel.source/${url
       .split('/')
       .pop()}.channel.source.m3u`;
-    await this.fileMgrService.downloadFileFrom3rd(url, targetFileName);
+    this.logger.info('begin download url= %s ', url);
+    await execPromise(`sh scripts/download.sh  ${url} ${targetFileName}`);
+
     this.logger.info('begin parse .m3u file');
-    const fileContent = this.fileMgrService.readFile(targetFileName);
-    //TODO: 解析m3u文件，准备存入数据库
+    if (!existsSync(targetFileName)) {
+      this.logger.error('download .m3u file failed');
+      throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
+    }
 
-    const { channelList, epgXMLUrls } = this.getChannelInfoFromM3u(fileContent);
+    const fileContent = await this.fileMgrService.readFile(targetFileName);
+    const { channelTagStrs, tvgXMLUrlStr } = await this.getChannelInfoFromM3u(
+      fileContent,
+    );
 
-    if (Array.isArray(channelList) && Array.isArray(epgXMLUrls)) {
+    const channelSources = this.parseJSONForChannels(
+      channelTagStrs,
+    ) as ChannelSource[];
+
+    await this.channelDAO.batchAddChannels(channelSources);
+
+    await execPromise(`sh scripts/download_programs.sh ${tvgXMLUrlStr}`);
+    this.logger.info('download program epg xml file success');
+
+    const programsUrls: string[] = tvgXMLUrlStr.split(',');
+
+    // 读取xml 文件
+    if (!existsSync(targetFileName)) {
+      this.logger.error('download .m3u file failed');
+      throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
+    }
+
+    if (Array.isArray([])) {
     }
   }
 
+  /**
+   * 从m3u 文件获取频道节目单信息
+   * @param fileContent
+   * @returns
+   */
   async getChannelInfoFromM3u(fileContent: string) {
     const m3uContentReg = new RegExp(ChannelConstant.M3U_FLAG);
 
@@ -43,14 +79,74 @@ export class ChannelService {
       return {};
     }
 
-    const channelInfoList = fileContent
+    const channelTagStrs = fileContent
       .split('\n')
       .filter((item) => item.startsWith(ChannelConstant.M3U_INFO_FLAG));
 
     const tvgXMLUrlStr = this.pickFromValue(fileContent, ChannelReg.TVG_URL, 1);
-    const epgXMLUrls = tvgXMLUrlStr.split(',');
-    //TODO: 需要转换XML数据
-    const newChannelList = channelInfoList.map((channelItemStr: string) => {
+
+    return {
+      channelTagStrs,
+      tvgXMLUrlStr,
+    };
+  }
+
+  async beginDownloadEpgProgramXml() {
+    await execPromise('sh scripts/download.sh');
+  }
+
+  private async parseJSONForProgram(programs: string[]) {
+    const programChannelSources: string[] = readdirSync('tmp/program.source');
+    const xmlParser = new XMLParser({
+      ignoreAttributes: false,
+    });
+
+    let channelSources = await this.channelDAO.getAllXmlFiles();
+    //过滤出频道节目单中的频道
+    channelSources = channelSources.filter((item) => {
+      return programChannelSources.find(
+        (sourceFileName) => sourceFileName === item.name,
+      );
+    });
+
+    if (arrayHasItem(channelSources)) {
+      //TODO: 准备存入数据，定义 结构类型
+      const allSourceChannels = channelSources.reduce(
+        async (total: any, sourceItem) => {
+          const fileContent = await this.fileMgrService.readFile(
+            `tmp/program.source/${sourceItem.name}`,
+          );
+          const xmlJsonContent = xmlParser.parse(fileContent);
+          if (xmlJsonContent?.tv?.channel) {
+            const channelObj = xmlJsonContent?.tv?.channel;
+            if (arrayHasItem(channelObj)) {
+              const channelObjs = channelObj.map((channelItem) => {
+                return {
+                  channelId: channelItem['@_id'],
+                  name: channelItem['@_display_name'],
+                  programUrlId: sourceItem.programUrlId,
+                };
+              });
+              return [...total, ...channelObjs];
+            }
+            if (isObject(channelObj)) {
+              const channelObjItem = {
+                channelId: channelObj['@_id'],
+                name: channelObj['@_display_name'],
+                programUrlId: sourceItem.programUrlId,
+              };
+              return [...total, channelObjItem];
+            }
+          }
+          return total;
+        },
+        [],
+      );
+    }
+  }
+
+  private parseJSONForChannels(channels: string[]) {
+    return channels.map((channelItemStr: string) => {
       const channelId = this.pickFromValue(
         channelItemStr,
         ChannelReg.TVG_ID,
@@ -89,10 +185,6 @@ export class ChannelService {
         playUrl,
       };
     });
-    return {
-      channelList: newChannelList,
-      epgXMLUrls,
-    };
   }
 
   private pickFromValue(content: string, rex: RegExp, valueIndex = 0) {

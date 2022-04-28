@@ -3,9 +3,10 @@ import { Logger, LoggerService, BaseException } from '@/common';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
-import fs from 'fs';
-import { XMLParser } from 'fast-xml-parser';
+import { readFile, existsSync, createWriteStream } from 'fs';
+import { promisify } from 'util';
 
+const readFilePromise = promisify(readFile);
 @Injectable()
 export class FileManagerService {
   private logger: Logger;
@@ -31,7 +32,7 @@ export class FileManagerService {
         })
         .pipe(map((resp) => resp.data));
       const downloadData = await lastValueFrom(downloadObservable);
-      downloadData.pipe(fs.createWriteStream(targetFile));
+      downloadData.pipe(createWriteStream(targetFile));
     } catch (error) {
       this.logger.error('download file error!');
       throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
@@ -40,19 +41,13 @@ export class FileManagerService {
     this.logger.info('[downEpgXMLFrom3rd] download successfully >>>');
   }
 
-  readFile(filePath: string): string {
-    return fs.readFileSync(filePath).toString();
-  }
-
-  async convertXmlToJson() {
-    try {
-      const xml = fs.readFileSync('./epg.xml', 'utf8');
-      const xmlParser = new XMLParser();
-      const jsonObj = xmlParser.parse(xml.toString());
-      return jsonObj;
-    } catch (error) {
-      this.logger.error('[convertXmlToJson] error>>>', error);
-      return {};
+  async readFile(filePath: string): Promise<string> {
+    if (!existsSync(filePath)) {
+      return '';
     }
+
+    return readFilePromise(filePath, {
+      encoding: 'utf8',
+    });
   }
 }

@@ -164,3 +164,34 @@ model Program {
   channelId String?  @map("channel_id")
   @@map("zap_tb_program")
 }
+
+model ChannelSource {
+  id        String  @id @default(cuid())
+  channelId String  @unique @map("channel_id")
+  logo      String?
+  name      String
+  language  String?
+  country   String?
+  playUrl   String?
+  status    Int     @default(-1)
+
+  @@map("zap_tb_channel_source")
+}
+
+model ProgramUrl {
+  id             String           @id @default(cuid())
+  url            String           @unique @map("url")
+  ProgramChannel ProgramChannel[]
+
+  @@map("zap_tb_program_url")
+}
+
+model ProgramChannel {
+  id           String     @id @default(cuid())
+  xmlId        ProgramUrl @relation(fields: [programUrlId], references: [id])
+  programUrlId String     @map("program_url_id")
+  channelId    String     @map("channel_id")
+  name         String?
+
+  @@map("zap_tb_program_channel")
+}
