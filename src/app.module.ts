@@ -3,9 +3,15 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as store from 'cache-manager-redis-store';
-import { CryptoConfig, EmailConfig, LoggerConfig } from '@/config';
+import {
+  CommonConfig,
+  CryptoConfig,
+  EmailConfig,
+  LoggerConfig,
+} from '@/config';
 import {
   AuthModule,
+  ChannelModule,
   ConfigureModule,
   DeviceModule,
   UserModule,
@@ -19,7 +25,7 @@ import { CommonModule, HttpRequestMiddleware } from '@/common';
       cache: true,
       isGlobal: true,
       ignoreEnvFile: false,
-      load: [LoggerConfig, EmailConfig, CryptoConfig],
+      load: [LoggerConfig, EmailConfig, CryptoConfig, CommonConfig],
     }),
     CacheModule.register({
       store,
@@ -31,7 +37,7 @@ import { CommonModule, HttpRequestMiddleware } from '@/common';
     DeviceModule,
     AuthModule,
     ConfigureModule,
-    // LoggerModule,
+    ChannelModule,
   ],
   controllers: [AppController],
   providers: [AppService],

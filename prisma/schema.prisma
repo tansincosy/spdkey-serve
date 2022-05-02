@@ -165,33 +165,60 @@ model Program {
   @@map("zap_tb_program")
 }
 
+model M3U {
+  id             String          @id @default(cuid())
+  url            String          @unique @default("")
+  name           String          @default("")
+  channelSources ChannelSource[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("zap_tb_m3u")
+}
+
 model ChannelSource {
   id        String  @id @default(cuid())
-  channelId String  @unique @map("channel_id")
-  logo      String?
-  name      String
-  language  String?
-  country   String?
-  playUrl   String?
+  channelId String  @map("channel_id")
+  logo      String? @db.Text
+  name      String  @db.Text
+  language  String  @db.Text
+  country   String  @db.Text
+  playUrl   String  @unique
   status    Int     @default(-1)
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  M3U   M3U?    @relation(fields: [m3UId], references: [id])
+  m3UId String? @map("m3u_Id")
   @@map("zap_tb_channel_source")
 }
 
-model ProgramUrl {
-  id             String           @id @default(cuid())
-  url            String           @unique @map("url")
-  ProgramChannel ProgramChannel[]
+model EPGUrl {
+  id   String @id @default(cuid())
+  url  String @unique @map("url")
+  name String @unique @map("name")
+
+  epgSourceChannel EPGSourceChannel[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
 
   @@map("zap_tb_program_url")
 }
 
-model ProgramChannel {
-  id           String     @id @default(cuid())
-  xmlId        ProgramUrl @relation(fields: [programUrlId], references: [id])
-  programUrlId String     @map("program_url_id")
-  channelId    String     @map("channel_id")
+model EPGSourceChannel {
+  id           String  @id @default(cuid())
+  programUrlId String  @map("program_url_id")
+  channelId    String  @map("channel_id")
   name         String?
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+
+  EPGUrl   EPGUrl? @relation(fields: [ePGUrlId], references: [id])
+  ePGUrlId String? @map("epg_url_id")
   @@map("zap_tb_program_channel")
 }

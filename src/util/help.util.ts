@@ -163,9 +163,21 @@ export function encryptedWithPbkdf2(userPassword: string): Promise<string> {
   });
 }
 
-export function arrayHasItem(param: any): boolean {
+export function moreThOne(param: any): boolean {
   if (Array.isArray(param)) {
     return param.length > 0;
   }
   return false;
+}
+
+/**
+ * 从地址中获取末尾文件名
+ * @param url
+ * @returns
+ */
+export function getNameByUrl(url: string) {
+  if (!url) {
+    return '';
+  }
+  return url.split('/').pop();
 }
