@@ -9,10 +9,7 @@ target_file="$2"
 # 文件目录
 targetPath=$(dirname "$target_file")
 
-if [ ! -d "$targetPath" ]; then
-    mkdir -p "$targetPath"
-    log "INFO" "create $targetPath success!"
-fi
+mkdir_if_not_exist "$targetPath"
 
 log "INFO" "source_file = $source_file target_file =$target_file"
 

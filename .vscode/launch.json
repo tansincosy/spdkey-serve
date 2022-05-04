@@ -4,16 +4,21 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "My application Name",
+            "name": "debug cya app",
             "runtimeArgs": [
                 "--nolazy",
                 "-r",
-                "ts-node/register"
+                "ts-node/register",
+                "-r",
+                "tsconfig-paths/register"
             ],
             "args": [
                 "${workspaceFolder}/src/main.ts"
             ],
-            "autoAttachChildProcesses": true
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector"
         }
     ]
 }

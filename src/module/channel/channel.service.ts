@@ -6,7 +6,7 @@ import { FileManagerService } from './file-manager.service';
 import { BasicExceptionCode, ChannelConstant, ChannelReg } from '@/constant';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { getNameByUrl, moreThOne } from '@/util';
 import { XMLParser } from 'fast-xml-parser';
 import { isObject } from 'lodash';
@@ -186,39 +186,50 @@ export class ChannelService {
     });
 
     if (moreThOne(allowEPGs)) {
+      await execPromise('sh scripts/merge_xml.sh');
+
+      this.logger.info('merge xml success!!');
+
       //准备存入数据，定义 结构类型
-      const allSourceChannels = allowEPGs.reduce(
-        async (total: any, sourceItem) => {
-          const fileContent = await this.fileMgrService.readFile(
-            `${appConfig.programXMLPath}/${sourceItem.url}`,
-          );
-          const xmlJsonContent = xmlParser.parse(fileContent);
-          if (xmlJsonContent?.tv?.channel) {
-            const channelObj = xmlJsonContent?.tv?.channel;
-            if (moreThOne(channelObj)) {
-              const channelObjs = channelObj.map((channelItem) => {
-                return {
-                  channelId: channelItem['@_id'],
-                  name: channelItem['@_display_name'],
-                  programUrlId: sourceItem.url,
-                };
-              });
-              return [...total, ...channelObjs];
-            }
-            if (isObject(channelObj)) {
-              const channelObjItem = {
-                channelId: channelObj['@_id'],
-                name: channelObj['@_display_name'],
-                programUrlId: sourceItem.url,
-              };
-              return [...total, channelObjItem];
-            }
-          }
-          return total;
-        },
-        [],
-      );
-      return allSourceChannels;
+      // const allSourceChannels = allowEPGs.reduce<
+      //   | {
+      //       channelId: string;
+      //       name: string;
+      //       programUrlId: string;
+      //     }[]
+      // >((total: any, sourceItem) => {
+      //   console.time();
+      //   console.log(sourceItem.name);
+      //   const fileContent = readFileSync(
+      //     `${appConfig.programXMLPath}/${sourceItem.name}`,
+      //     'utf-8',
+      //   );
+      //   console.timeEnd();
+      //   const xmlJsonContent = xmlParser.parse(fileContent);
+      //   if (xmlJsonContent?.tv?.channel) {
+      //     const channelObj = xmlJsonContent?.tv?.channel;
+      //     if (moreThOne(channelObj)) {
+      //       const channelObjs = channelObj.map((channelItem) => {
+      //         return {
+      //           channelId: channelItem['@_id'],
+      //           name: channelItem['display-name'],
+      //           programUrlId: sourceItem.url,
+      //         };
+      //       });
+      //       return [...total, ...channelObjs];
+      //     }
+      //     if (isObject(channelObj)) {
+      //       const channelObjItem = {
+      //         channelId: channelObj['@_id'],
+      //         name: channelObj['display-name'],
+      //         programUrlId: sourceItem.id,
+      //       };
+      //       return [...total, channelObjItem];
+      //     }
+      //   }
+      //   return total;
+      // }, []);
+      return [];
     }
     return [];
   }
