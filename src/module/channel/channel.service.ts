@@ -175,9 +175,6 @@ export class ChannelService {
     // await this.batchDownloadProgram(tvgXMLUrlStr, appConfig.programXMLPath);
 
     const epgXMLFiles: string[] = readdirSync(appConfig.programXMLPath);
-    const xmlParser = new XMLParser({
-      ignoreAttributes: false,
-    });
 
     const epgUrls = await this.channelDAO.getAllEpgXmlUrl();
     //过滤出频道节目单中的频道
@@ -186,10 +183,22 @@ export class ChannelService {
     });
 
     if (moreThOne(allowEPGs)) {
-      await execPromise('sh scripts/merge_xml.sh');
+      const { stdout } = await execPromise(
+        `sh scripts/merge_xml.sh ${appConfig.allowChannelPath}`,
+      );
 
-      this.logger.info('merge xml success!!');
+      this.logger.info('merge xml success!! stdout=', stdout);
 
+      const fileContent = readFileSync(
+        `${appConfig.allowChannelPath}/${stdout}`,
+        'utf-8',
+      );
+      fileContent.split('</channel').map((item) => {
+        const [, fileName] = item.match(/tmp\/program\/(.*)/) || [];
+        const [, channelId, name, logo, url] = item.match(
+          /<channel id="(.*)"><display-name>(.*)<\/display-name>.*?<icon src="(.*)"\/>.*?<url>(.*)<\/url>/,
+        );
+      });
       //准备存入数据，定义 结构类型
       // const allSourceChannels = allowEPGs.reduce<
       //   | {

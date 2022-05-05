@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # 日志组件
 filname=$(basename "$0")
@@ -7,7 +7,7 @@ logFile=logs/scirpts.log
 function log {
     log_level=$1
     log_message=$2
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] [$log_level] [$filname]- $log_message" >>$logFile
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] [$log_level] [$filname]- $log_message" >>"$logFile"
 
 }
 

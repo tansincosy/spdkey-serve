@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 . ./scripts/common.sh
 
 # 地址

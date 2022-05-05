@@ -1,6 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-. ./scripts/common.sh
+DIRECTORY=$(cd $(dirname $0) && pwd)
+
+. ./$DIRECTORY/common.sh
 
 pread_download_urlStr=$1
 
