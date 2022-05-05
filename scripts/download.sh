@@ -13,7 +13,7 @@ mkdir_if_not_exist "$targetPath"
 
 log "INFO" "source_file = $source_file target_file =$target_file"
 
-curl -k "$source_file" >>"$target_file"
+curl -k "$source_file" >"$target_file"
 
 result=$?
 

@@ -8,9 +8,9 @@ function main() {
 
     mkdir_if_not_exist "$file_name"
 
-    dare_file=$(date +"%Y-%m-%d %H:%M:%S").xml
-    log "INFO" "begin merge channel info to $dare_file"
-    grep "<channel" -h "${all_xml[@]}" >>$file_name/"$dare_file"
+    date_file=$(date +"%Y-%m-%d %H:%M:%S").xml
+    log "INFO" "begin merge channel info to $date_file"
+    grep "<channel" "${all_xml[@]}" >$file_name/"$date_file"
     log "INFO" "merge success!!"
 }
 
