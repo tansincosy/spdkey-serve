@@ -124,10 +124,13 @@ export class ChannelService {
     });
 
     await this.channelDAO.batchAddEpgXMUrl(batchAddEpgUrls);
+
+    // await this.batchDownloadProgram(tvgXMLUrlStr, appConfig.programXMLPath);
     const programChannels = await this.parseJSONForProgram();
 
     if (moreThOne(programChannels)) {
-      // await this.channelDAO.batchAddChannelProgram(programChannels);
+      await this.channelDAO.batchAddEpgXmlChannels(programChannels);
+      this.logger.info('batch save batchAddEpgXmlChannels success');
     }
 
     const programsUrls: string[] = tvgXMLUrlStr.split(',');
@@ -173,8 +176,6 @@ export class ChannelService {
   private async parseJSONForProgram() {
     const appConfig = this.configService.get<CommonConfig>('appConfig');
 
-    // await this.batchDownloadProgram(tvgXMLUrlStr, appConfig.programXMLPath);
-
     const epgXMLFiles: string[] = readdirSync(appConfig.programXMLPath);
 
     const epgUrls = await this.channelDAO.getAllEpgXmlUrl();
@@ -211,49 +212,8 @@ export class ChannelService {
           };
         }) as EpgChannel[];
 
-        await this.channelDAO.batchAddEpgXmlChannels(channelEpgs);
-        this.logger.info('batch save batchAddEpgXmlChannels success');
+        return channelEpgs;
       }
-
-      //准备存入数据，定义 结构类型
-      // const allSourceChannels = allowEPGs.reduce<
-      //   | {
-      //       channelId: string;
-      //       name: string;
-      //       programUrlId: string;
-      //     }[]
-      // >((total: any, sourceItem) => {
-      //   console.time();
-      //   console.log(sourceItem.name);
-      //   const fileContent = readFileSync(
-      //     `${appConfig.programXMLPath}/${sourceItem.name}`,
-      //     'utf-8',
-      //   );
-      //   console.timeEnd();
-      //   const xmlJsonContent = xmlParser.parse(fileContent);
-      //   if (xmlJsonContent?.tv?.channel) {
-      //     const channelObj = xmlJsonContent?.tv?.channel;
-      //     if (moreThOne(channelObj)) {
-      //       const channelObjs = channelObj.map((channelItem) => {
-      //         return {
-      //           channelId: channelItem['@_id'],
-      //           name: channelItem['display-name'],
-      //           programUrlId: sourceItem.url,
-      //         };
-      //       });
-      //       return [...total, ...channelObjs];
-      //     }
-      //     if (isObject(channelObj)) {
-      //       const channelObjItem = {
-      //         channelId: channelObj['@_id'],
-      //         name: channelObj['display-name'],
-      //         programUrlId: sourceItem.id,
-      //       };
-      //       return [...total, channelObjItem];
-      //     }
-      //   }
-      //   return total;
-      // }, []);
       return [];
     }
     return [];
