@@ -1,6 +1,6 @@
 import { Logger, LoggerService, PrismaService } from '@/common';
 import { Injectable } from '@nestjs/common';
-import { M3uChannel, EpgUrl } from './channel.type';
+import { M3uChannel, EpgUrl, EpgChannel } from './channel.type';
 @Injectable()
 export class ChannelDAO {
   private logger: Logger;
@@ -11,6 +11,10 @@ export class ChannelDAO {
     this.logger = this.loggerService.getLogger(ChannelDAO.name);
   }
 
+  /**
+   * 节目单数据源
+   * @param channels
+   */
   async batchAddChannelSource(channels: M3uChannel[]) {
     this.logger.info('begin batchAddChannels to db');
     await this.prismaService.channelSource.createMany({
@@ -73,5 +77,20 @@ export class ChannelDAO {
 
   getAllEpgXmlUrl() {
     return this.prismaService.ePGUrl.findMany({});
+  }
+
+  async batchAddEpgXmlChannels(epgChannels: EpgChannel[]) {
+    await this.prismaService.ePGSourceChannel.deleteMany({});
+    return this.prismaService.ePGSourceChannel.createMany({
+      data: epgChannels.map((item) => {
+        return {
+          name: item.name,
+          channelId: item.channelId || '',
+          logo: item.logo,
+          ePGUrlId: item.epgUrlId,
+        };
+      }),
+      skipDuplicates: true,
+    });
   }
 }

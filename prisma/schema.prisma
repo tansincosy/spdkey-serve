@@ -209,10 +209,10 @@ model EPGUrl {
 }
 
 model EPGSourceChannel {
-  id           String  @id @default(cuid())
-  programUrlId String  @map("program_url_id")
-  channelId    String  @map("channel_id")
-  name         String?
+  id        String  @id @default(cuid())
+  channelId String? @default("") @map("channel_id")
+  name      String?
+  logo      String? @default("")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")

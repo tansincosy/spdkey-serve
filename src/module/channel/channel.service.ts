@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { CommonConfig } from '@/config';
 import { resolve } from 'path';
 import * as dayjs from 'dayjs';
+import { EpgChannel } from './channel.type';
 
 const execPromise = promisify(exec);
 @Injectable()
@@ -190,15 +191,30 @@ export class ChannelService {
       this.logger.info('merge xml success!! stdout=', stdout);
 
       const fileContent = readFileSync(
-        `${appConfig.allowChannelPath}/${stdout}`,
+        `${appConfig.allowChannelPath}/${stdout.trim()}`,
         'utf-8',
       );
-      fileContent.split('</channel').map((item) => {
-        const [, fileName] = item.match(/tmp\/program\/(.*)/) || [];
-        const [, channelId, name, logo, url] = item.match(
-          /<channel id="(.*)"><display-name>(.*)<\/display-name>.*?<icon src="(.*)"\/>.*?<url>(.*)<\/url>/,
-        );
-      });
+      if (fileContent) {
+        const channelEpgs = fileContent.split('</channel').map((item) => {
+          const [, fileName] = item.match(/tmp\/program\/(.*):<channel/) || [];
+          const [, channelId, name, logo, url] =
+            item.match(
+              /<channel id="(.*)"><display-name>(.*)<\/display-name>.*?<icon src="(.*)"\/>.*?<url>(.*)<\/url>/,
+            ) || [];
+          const allowEPG = allowEPGs.find((epg) => epg.name === fileName);
+          return {
+            epgUrlId: allowEPG?.id,
+            channelId,
+            name,
+            logo,
+            url,
+          };
+        }) as EpgChannel[];
+
+        await this.channelDAO.batchAddEpgXmlChannels(channelEpgs);
+        this.logger.info('batch save batchAddEpgXmlChannels success');
+      }
+
       //准备存入数据，定义 结构类型
       // const allSourceChannels = allowEPGs.reduce<
       //   | {
