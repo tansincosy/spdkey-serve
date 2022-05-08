@@ -14,6 +14,7 @@ async function bootstrap() {
     new ValidationPipe({
       skipMissingProperties: true,
       enableDebugMessages: true,
+      forbidUnknownValues: true,
     }),
   );
   await app.listen(process.env.app_port || 3000);

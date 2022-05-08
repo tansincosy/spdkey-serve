@@ -6,6 +6,7 @@ export interface M3uChannel {
   country?: string;
   playUrl?: string;
   m3UId?: string;
+  // status?: string;
 }
 
 export interface EpgUrl {

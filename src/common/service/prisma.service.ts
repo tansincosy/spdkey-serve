@@ -9,7 +9,7 @@ export class PrismaService
   constructor() {
     super({
       log:
-        process.env.LOG_LEVEL === 'debug'
+        process.env.log_level === 'debug'
           ? ['query', 'info', 'warn', 'error']
           : ['error'],
     });

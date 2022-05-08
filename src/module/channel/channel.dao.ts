@@ -1,4 +1,5 @@
 import { Logger, LoggerService, PrismaService } from '@/common';
+import { getOrderBy } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { M3uChannel, EpgUrl, EpgChannel } from './channel.type';
 @Injectable()
@@ -91,6 +92,69 @@ export class ChannelDAO {
         };
       }),
       skipDuplicates: true,
+    });
+  }
+
+  getSearchParam(search) {
+    let searchResult: any = {};
+    searchResult = {
+      ...search,
+    };
+    if (search.status) {
+      searchResult.status = +search.status;
+    }
+    if (searchResult.name) {
+      searchResult.name = {
+        contains: search.name,
+      };
+    }
+    return searchResult;
+  }
+
+  async getChannelSources(
+    pageSize = 20,
+    current = 1,
+    createdAt?: any,
+    updatedAt?: any,
+    search?: M3uChannel,
+  ) {
+    const orderBy = getOrderBy(createdAt, updatedAt);
+    this.logger.info(
+      'begin getChannelSources to db pageSize = %s,current = %s',
+      pageSize,
+      current,
+      'search = ',
+      search,
+    );
+
+    const searchParam = this.getSearchParam(search);
+
+    return this.prismaService.$transaction([
+      this.prismaService.channelSource.findMany({
+        take: pageSize,
+        skip: current - 1,
+        orderBy: {
+          ...orderBy,
+        },
+        where: {
+          ...searchParam,
+        },
+      }),
+      this.prismaService.channelSource.count({
+        where: {
+          ...searchParam,
+        },
+      }),
+    ]);
+  }
+
+  batchDel(ids: string[]) {
+    return this.prismaService.channelSource.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
   }
 }

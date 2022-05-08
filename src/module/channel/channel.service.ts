@@ -1,4 +1,4 @@
-import { ParseUrlDTO } from './channel.dto';
+import { DelIdDTO, ParseUrlDTO, QueryChannelSourceDTO } from './channel.dto';
 import { Logger, LoggerService, BaseException } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
@@ -7,9 +7,7 @@ import { BasicExceptionCode, ChannelConstant, ChannelReg } from '@/constant';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { existsSync, readdirSync, readFileSync } from 'fs';
-import { getNameByUrl, moreThOne } from '@/util';
-import { XMLParser } from 'fast-xml-parser';
-import { isObject } from 'lodash';
+import { convertPrismaSort, getNameByUrl, moreThOne } from '@/util';
 import { ConfigService } from '@nestjs/config';
 import { CommonConfig } from '@/config';
 import { resolve } from 'path';
@@ -29,13 +27,16 @@ export class ChannelService {
     this.logger = this.loggerService.getLogger(ChannelService.name);
   }
 
-  beginDownloadFile(url: string, fileName: string) {
+  async beginDownloadFile(url: string, fileName: string) {
     this.logger.info(
       'begin download file, url =%s,fileName= %s',
       url,
       fileName,
     );
-    return execPromise(`sh scripts/download.sh ${url} ${fileName}`);
+    const { stdout } = await execPromise(
+      `sh scripts/download.sh ${url} ${fileName}`,
+    );
+    this.logger.info('cmd result  stdout = ', stdout);
   }
   /**
    *  判断是否要下载
@@ -71,7 +72,7 @@ export class ChannelService {
   }
 
   async batchDownloadProgram(tvgXMLUrlStr: string, programXMLPath: string) {
-    await execPromise(
+    return execPromise(
       `sh scripts/batch_download.sh ${tvgXMLUrlStr} ${programXMLPath}`,
     );
   }
@@ -85,7 +86,7 @@ export class ChannelService {
       await this.beginDownloadFile(url, fileName);
     }
     this.logger.debug(
-      'begin download needDownload= %s ,fileName = %s',
+      'end download needDownload= %s ,fileName = %s',
       needDownload,
       fileName,
     );
@@ -114,6 +115,7 @@ export class ChannelService {
       })),
     );
 
+    this.logger.info('begin batchAddEpgXMUrl process');
     const epgUrls = tvgXMLUrlStr.split(',') || [];
     const batchAddEpgUrls = epgUrls.map((url) => {
       const name = getNameByUrl(url);
@@ -124,22 +126,18 @@ export class ChannelService {
     });
 
     await this.channelDAO.batchAddEpgXMUrl(batchAddEpgUrls);
-
-    // await this.batchDownloadProgram(tvgXMLUrlStr, appConfig.programXMLPath);
+    this.logger.info('end batchAddEpgXMUrl process');
+    const appConfig = this.configService.get<CommonConfig>('appConfig');
+    this.logger.info('begin download epg.xml');
+    await this.batchDownloadProgram(tvgXMLUrlStr, appConfig.programXMLPath);
     const programChannels = await this.parseJSONForProgram();
+    this.logger.info('end download epg.xml');
 
     if (moreThOne(programChannels)) {
       await this.channelDAO.batchAddEpgXmlChannels(programChannels);
       this.logger.info('batch save batchAddEpgXmlChannels success');
     }
-
-    const programsUrls: string[] = tvgXMLUrlStr.split(',');
-
-    // 读取xml 文件
-    if (!existsSync(targetFileName)) {
-      this.logger.error('download .m3u file failed');
-      throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
-    }
+    return {};
   }
 
   /**
@@ -270,5 +268,31 @@ export class ChannelService {
       return match[valueIndex];
     }
     return '';
+  }
+
+  async getM3uUrl(query: QueryChannelSourceDTO) {
+    const { current, pageSize, updatedAt, createdAt, ...restParams } = query;
+
+    this.logger.info('getM3uUrl  current,', current, 'pageSize', pageSize);
+    const [data, total] = await this.channelDAO.getChannelSources(
+      +pageSize,
+      +current,
+      createdAt,
+      updatedAt,
+      restParams,
+    );
+    return {
+      data,
+      pageSize: query.pageSize,
+      current: query.current,
+      total,
+    };
+  }
+
+  async batchDelete(idObj: DelIdDTO) {
+    const { ids } = idObj;
+    await this.channelDAO.batchDel(ids);
+    this.logger.info('batch delete success ids = ', ids);
+    return {};
   }
 }

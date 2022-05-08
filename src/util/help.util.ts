@@ -181,3 +181,26 @@ export function getNameByUrl(url: string) {
   }
   return url.split('/').pop();
 }
+
+export function convertPrismaSort(tableSort: string): string {
+  const sortMap = {
+    ascend: 'asc',
+    descend: 'desc',
+  };
+  return sortMap[tableSort] || '';
+}
+
+export const getOrderBy: any = (createdAt?: string, updatedAt?: string) => {
+  if (createdAt) {
+    return {
+      createdAt: convertPrismaSort(createdAt),
+    };
+  }
+
+  if (updatedAt) {
+    return {
+      updatedAt: convertPrismaSort(updatedAt),
+    };
+  }
+  return {};
+};
