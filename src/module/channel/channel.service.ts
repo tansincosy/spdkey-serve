@@ -275,8 +275,8 @@ export class ChannelService {
 
     this.logger.info('getM3uUrl  current,', current, 'pageSize', pageSize);
     const [data, total] = await this.channelDAO.getChannelSources(
-      +pageSize,
-      +current,
+      pageSize && +pageSize,
+      current && +current,
       createdAt,
       updatedAt,
       restParams,
@@ -294,5 +294,28 @@ export class ChannelService {
     await this.channelDAO.batchDel(ids);
     this.logger.info('batch delete success ids = ', ids);
     return {};
+  }
+
+  async getProgramChannel(query: QueryChannelSourceDTO) {
+    const { current, pageSize, updatedAt, createdAt, ...restParams } = query;
+    this.logger.info(
+      'getProgramChannel  current,',
+      current,
+      'pageSize',
+      pageSize,
+    );
+    const [data, total] = await this.channelDAO.getEpgXmlChannels(
+      pageSize && +pageSize,
+      current && +current,
+      createdAt,
+      updatedAt,
+      restParams,
+    );
+    return {
+      data,
+      pageSize: query.pageSize,
+      current: query.current,
+      total,
+    };
   }
 }

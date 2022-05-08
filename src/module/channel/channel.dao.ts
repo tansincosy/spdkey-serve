@@ -157,4 +157,32 @@ export class ChannelDAO {
       },
     });
   }
+
+  async getEpgXmlChannels(
+    pageSize = 20,
+    current = 1,
+    createdAt?: any,
+    updatedAt?: any,
+    search?: EpgChannel,
+  ) {
+    const orderBy = getOrderBy(createdAt, updatedAt);
+    const searchParam = this.getSearchParam(search);
+    return this.prismaService.$transaction([
+      this.prismaService.ePGSourceChannel.findMany({
+        take: pageSize,
+        skip: current - 1,
+        orderBy: {
+          ...orderBy,
+        },
+        where: {
+          ...searchParam,
+        },
+      }),
+      this.prismaService.ePGSourceChannel.count({
+        where: {
+          ...searchParam,
+        },
+      }),
+    ]);
+  }
 }
