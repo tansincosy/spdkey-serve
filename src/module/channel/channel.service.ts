@@ -1,5 +1,15 @@
-import { DelIdDTO, ParseUrlDTO, QueryChannelSourceDTO } from './channel.dto';
-import { Logger, LoggerService, BaseException } from '@/common';
+import {
+  ParseUrlDTO,
+  QueryChannelDTO,
+  QueryChannelSourceDTO,
+} from './channel.dto';
+import {
+  Logger,
+  LoggerService,
+  BaseException,
+  DeleteIdPrams,
+  DownloadService,
+} from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
 import { FileManagerService } from './file-manager.service';
@@ -7,7 +17,7 @@ import { BasicExceptionCode, ChannelConstant, ChannelReg } from '@/constant';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { existsSync, readdirSync, readFileSync } from 'fs';
-import { convertPrismaSort, getNameByUrl, moreThOne } from '@/util';
+import { getNameByUrl, moreThOne } from '@/util';
 import { ConfigService } from '@nestjs/config';
 import { CommonConfig } from '@/config';
 import { resolve } from 'path';
@@ -23,6 +33,7 @@ export class ChannelService {
     private readonly loggerService: LoggerService,
     private readonly fileMgrService: FileManagerService,
     private readonly configService: ConfigService,
+    private readonly downloadService: DownloadService,
   ) {
     this.logger = this.loggerService.getLogger(ChannelService.name);
   }
@@ -46,28 +57,21 @@ export class ChannelService {
   async isCanDownloadFile(url: string) {
     const { name } = (await this.channelDAO.findM3uNameUrlByUrl(url)) || {};
     const appConfig = this.configService.get<CommonConfig>('appConfig');
+    const fileName = resolve(appConfig.m3uPath, name);
     if (name) {
-      const hasBeenDownloadFile = resolve(appConfig.m3uPath, name);
-      const pathHasFile = existsSync(hasBeenDownloadFile);
+      const pathHasFile = existsSync(fileName);
       if (!pathHasFile) {
         return {
           needDownload: true,
-          fileName: hasBeenDownloadFile,
         };
       }
       return {
         needDownload: false,
-        fileName: hasBeenDownloadFile,
+        fileName: fileName,
       };
     }
-    const fileName = getNameByUrl(url);
-    const targetFileName = `${resolve(
-      appConfig.m3uPath,
-      dayjs().format('YYYY-MM-DD_HH-mm-ss') + `.${fileName}`,
-    )}`;
     return {
       needDownload: true,
-      fileName: targetFileName,
     };
   }
 
@@ -81,27 +85,37 @@ export class ChannelService {
 
   async parseM3uUrl(parseUrl: ParseUrlDTO) {
     const { url } = parseUrl;
-    const { needDownload, fileName } = await this.isCanDownloadFile(url);
-    if (needDownload) {
-      await this.beginDownloadFile(url, fileName);
+    const appConfig = this.configService.get<CommonConfig>('appConfig');
+    const checkDownload = await this.isCanDownloadFile(url);
+    if (checkDownload.needDownload) {
+      checkDownload.fileName = await new Promise(async (resolve, reject) => {
+        await this.downloadService
+          .downloadFile(url, appConfig.m3uPath, 'YYYYMMDD')
+          .on('end', (dl) => {
+            resolve(dl.fileName);
+          })
+          .start()
+          .catch(reject);
+      });
     }
-    this.logger.debug(
-      'end download needDownload= %s ,fileName = %s',
-      needDownload,
-      fileName,
-    );
+    this.logger.debug('end download needDownload= %s', checkDownload);
     this.logger.info('begin parse .m3u file');
-    if (!existsSync(fileName)) {
+    const filePathName = appConfig.m3uPath + checkDownload.fileName;
+    if (!existsSync(filePathName)) {
       this.logger.error('download .m3u file failed');
       throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
     }
-    const targetFileName = getNameByUrl(fileName);
     //获取m3u Id
-    const { id } = await this.channelDAO.saveM3uInfo(url, targetFileName);
+    const { id } = await this.channelDAO.saveM3uInfo(
+      url,
+      checkDownload.fileName,
+    );
     this.logger.info('save m3u info success');
 
     //读取文件内容
-    const fileContent = await this.fileMgrService.readFile(fileName);
+    const fileContent = await this.fileMgrService.readFile(
+      checkDownload.fileName,
+    );
     const { channelTagStrs, tvgXMLUrlStr } = await this.getChannelInfoFromM3u(
       fileContent,
     );
@@ -127,7 +141,6 @@ export class ChannelService {
 
     await this.channelDAO.batchAddEpgXMUrl(batchAddEpgUrls);
     this.logger.info('end batchAddEpgXMUrl process');
-    const appConfig = this.configService.get<CommonConfig>('appConfig');
     this.logger.info('begin download epg.xml');
     await this.batchDownloadProgram(tvgXMLUrlStr, appConfig.programXMLPath);
     const programChannels = await this.parseJSONForProgram();
@@ -289,7 +302,7 @@ export class ChannelService {
     };
   }
 
-  async batchDelete(idObj: DelIdDTO) {
+  async batchDelete(idObj: DeleteIdPrams) {
     const { ids } = idObj;
     await this.channelDAO.batchDel(ids);
     this.logger.info('batch delete success ids = ', ids);
@@ -317,5 +330,9 @@ export class ChannelService {
       current: query.current,
       total,
     };
+  }
+
+  getChannels(channelDTO: QueryChannelDTO) {
+    return null;
   }
 }

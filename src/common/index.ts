@@ -9,3 +9,4 @@ export * from './middleware/http-request.middleware';
 export * from './common.module';
 export * from './interface/page-info.interface';
 export * from './dto/query.dto';
+export * from './service/download.service';

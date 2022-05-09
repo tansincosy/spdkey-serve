@@ -1,5 +1,10 @@
+import { DeleteIdPrams, QueryParams } from '@/common';
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
-import { DelIdDTO, ParseUrlDTO, QueryChannelSourceDTO } from './channel.dto';
+import {
+  ParseUrlDTO,
+  QueryChannelDTO,
+  QueryChannelSourceDTO,
+} from './channel.dto';
 import { ChannelService } from './channel.service';
 
 @Controller('channel')
@@ -17,7 +22,12 @@ export class ChannelController {
   }
 
   @Delete('/source')
-  deleteM3uUrl(@Body() idObj: DelIdDTO) {
+  deleteM3uUrl(@Body() idObj: DeleteIdPrams) {
     return this.channelService.batchDelete(idObj);
+  }
+
+  @Get()
+  getChannels(@Query() channelParams: QueryChannelDTO) {
+    return this.channelService.getChannels(channelParams);
   }
 }

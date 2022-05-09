@@ -7,6 +7,10 @@ export class QueryParams {
   pageSize?: string;
   @IsString()
   id?: string;
+  @IsString()
+  createdAt?: string;
+  @IsString()
+  updatedAt?: string;
 }
 
 export class DeleteIdPrams {

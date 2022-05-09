@@ -204,3 +204,16 @@ export const getOrderBy: any = (createdAt?: string, updatedAt?: string) => {
   }
   return {};
 };
+
+export const byteHelper = function (value) {
+  if (value === 0) {
+    return '0 b';
+  }
+  const units = ['b', 'kB', 'MB', 'GB', 'TB'];
+  const number = Math.floor(Math.log(value) / Math.log(1024));
+  return (
+    (value / Math.pow(1024, Math.floor(number))).toFixed(1) +
+    ' ' +
+    units[number]
+  );
+};

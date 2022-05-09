@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsArray, Matches } from 'class-validator';
+import { QueryParams } from '@/common';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class ParseUrlDTO {
   @IsString()
@@ -7,15 +8,7 @@ export class ParseUrlDTO {
   url: string;
 }
 
-export class QueryChannelSourceDTO {
-  @IsString()
-  current?: string;
-  @IsString()
-  pageSize?: string;
-  @IsString()
-  createdAt?: string;
-  @IsString()
-  updatedAt?: string;
+export class QueryChannelSourceDTO extends QueryParams {
   @IsString()
   status?: string;
   @IsString()
@@ -24,7 +17,4 @@ export class QueryChannelSourceDTO {
   language?: string;
 }
 
-export class DelIdDTO {
-  @IsArray()
-  ids: string[];
-}
+export class QueryChannelDTO extends QueryParams {}

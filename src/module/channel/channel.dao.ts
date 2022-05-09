@@ -158,6 +158,10 @@ export class ChannelDAO {
     });
   }
 
+  getChannels() {
+    return this.prismaService.channelSource.findMany({});
+  }
+
   async getEpgXmlChannels(
     pageSize = 20,
     current = 1,

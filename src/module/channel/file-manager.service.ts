@@ -13,30 +13,6 @@ export class FileManagerService {
     this.logger = this.loggerService.getLogger(FileManagerService.name);
   }
 
-  //   async downloadFileFrom3rd(epgUrl: string, targetFile: string) {
-  //     this.logger.info(
-  //       '[downloadFileFrom3rd] epgUrl = %s, targetFile =%s',
-  //       epgUrl,
-  //       targetFile,
-  //     );
-  //     try {
-  //       const downloadObservable = this.httpService
-  //         .request({
-  //           method: 'GET',
-  //           url: epgUrl,
-  //           responseType: 'stream',
-  //         })
-  //         .pipe(map((resp) => resp.data));
-  //       const downloadData = await lastValueFrom(downloadObservable);
-  //       downloadData.pipe(createWriteStream(targetFile));
-  //     } catch (error) {
-  //       this.logger.error('download file error!');
-  //       throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
-  //     }
-
-  //     this.logger.info('[downEpgXMLFrom3rd] download successfully >>>');
-  //   }
-
   async readFile(filePath: string): Promise<string> {
     if (!existsSync(filePath)) {
       return '';
