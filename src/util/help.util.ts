@@ -217,3 +217,16 @@ export const byteHelper = function (value) {
     units[number]
   );
 };
+
+export const getContentByRegex = (
+  content: string,
+  rex: RegExp,
+  valueIndex = 0,
+) => {
+  const match = content.match(rex);
+
+  if (Array.isArray(match) && match.length > valueIndex) {
+    return match[valueIndex];
+  }
+  return '';
+};

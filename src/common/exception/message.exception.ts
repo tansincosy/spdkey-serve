@@ -53,4 +53,5 @@ export const BasicException = new Map<
   [TMDBErrorCode.SERVER_ERROR, 'TMDB:: server Invalid'],
   [BasicExceptionCode.DOWNLOAD_FILE_FAILED, 'download file failed'],
   [BasicExceptionCode.DOWNLOAD_FILE_TYPE_ERROR, 'download file type error'],
+  [BasicExceptionCode.PARSER_FILE_FAILED, 'parse file failed'],
 ]);

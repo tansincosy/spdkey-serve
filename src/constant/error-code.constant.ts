@@ -19,6 +19,7 @@ export enum BasicExceptionCode {
 
   DOWNLOAD_FILE_FAILED = 121000,
   DOWNLOAD_FILE_TYPE_ERROR = 121001,
+  PARSER_FILE_FAILED = 121002,
 }
 
 export enum UserExceptionCode {

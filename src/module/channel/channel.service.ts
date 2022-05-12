@@ -1,3 +1,4 @@
+import { M3UService } from './m3u.service';
 import {
   ParseUrlDTO,
   QueryChannelDTO,
@@ -16,12 +17,17 @@ import { FileManagerService } from './file-manager.service';
 import { BasicExceptionCode, ChannelConstant, ChannelReg } from '@/constant';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { existsSync, readdirSync, readFileSync } from 'fs';
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  ensureDirSync,
+  emptyDir,
+} from 'fs-extra';
 import { getNameByUrl, moreThOne } from '@/util';
 import { ConfigService } from '@nestjs/config';
 import { CommonConfig } from '@/config';
-import { resolve } from 'path';
-import * as dayjs from 'dayjs';
+import { resolve, join } from 'path';
 import { EpgChannel } from './channel.type';
 
 const execPromise = promisify(exec);
@@ -34,6 +40,7 @@ export class ChannelService {
     private readonly fileMgrService: FileManagerService,
     private readonly configService: ConfigService,
     private readonly downloadService: DownloadService,
+    private readonly m3UService: M3UService,
   ) {
     this.logger = this.loggerService.getLogger(ChannelService.name);
   }
@@ -332,7 +339,50 @@ export class ChannelService {
     };
   }
 
-  getChannels(channelDTO: QueryChannelDTO) {
-    return null;
+  async contrSourceChannelData(m3uUrl: string, isForceUpdate: boolean) {
+    if (isForceUpdate) {
+      await this.m3UService.deleteM3uRecord(m3uUrl);
+    }
+    const m3uInfo = await this.m3UService.findM3uByUrl(m3uUrl);
+    if (m3uInfo.name) {
+      const isExist = this.m3UService.isExistM3uByName(m3uInfo.name);
+      if (!isExist) {
+        m3uInfo.name = await this.m3UService
+          .downloadM3U(m3uUrl)
+          .catch((error) => {
+            this.logger.error('download m3u error = ', error);
+            throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
+          });
+        const saveResult = await this.m3UService.saveM3UInfoData(
+          m3uInfo.name,
+          m3uUrl,
+        );
+        m3uInfo.id = saveResult.id;
+      }
+    } else {
+      m3uInfo.name = await this.m3UService
+        .downloadM3U(m3uUrl)
+        .catch((error) => {
+          this.logger.error('download m3u error = ', error);
+          throw new BaseException(BasicExceptionCode.DOWNLOAD_FILE_FAILED);
+        });
+    }
+
+    const { m3uSourceData, epgXmlData } = await this.m3UService.parseM3u(
+      m3uInfo.name,
+    );
+    if (m3uSourceData.length > 0) {
+      this.logger.info('begin save m3u data');
+      const channels = this.m3UService.m3uChannelToJson(m3uSourceData);
+      await this.m3UService.batchAddChannelSource(
+        channels.map((channelSourceItem) => ({
+          ...channelSourceItem,
+          m3UId: m3uInfo.id,
+        })),
+      );
+      const channelSources = await this.m3UService.getAllM3U();
+      this.logger.info('begin download channel logo');
+      this.m3UService.downloadChannelLogo(channelSources);
+    }
   }
 }
