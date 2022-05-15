@@ -1,10 +1,6 @@
-import { DeleteIdPrams, QueryParams } from '@/common';
+import { DeleteIdPrams } from '@/common';
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
-import {
-  ParseUrlDTO,
-  QueryChannelDTO,
-  QueryChannelSourceDTO,
-} from './channel.dto';
+import { ParseUrlDTO, QueryChannelSourceDTO } from './channel.dto';
 import { ChannelService } from './channel.service';
 
 @Controller('channel')
@@ -13,7 +9,10 @@ export class ChannelController {
 
   @Post('/source')
   parseM3uUrl(@Body() parseUrlDTO: ParseUrlDTO) {
-    return this.channelService.parseM3uUrl(parseUrlDTO);
+    return this.channelService.contrSourceChannelData(
+      parseUrlDTO.url,
+      parseUrlDTO.isForceUpdate,
+    );
   }
 
   @Get('/source')
@@ -26,8 +25,8 @@ export class ChannelController {
     return this.channelService.batchDelete(idObj);
   }
 
-  @Get()
-  getChannels(@Query() channelParams: QueryChannelDTO) {
-    return this.channelService.getChannels(channelParams);
+  @Get('/source/percent')
+  getPercent() {
+    return this.channelService.getDownloadedPercent();
   }
 }

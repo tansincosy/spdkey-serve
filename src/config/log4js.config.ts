@@ -19,7 +19,7 @@ export const logConfig: Configuration = {
     },
     access: {
       type: 'dateFile',
-      filename: 'logs/access.log',
+      filename: 'app_data/log/interface/http.log',
       pattern: 'yyyy-MM-dd',
       category: 'http',
       layout: {
@@ -27,9 +27,19 @@ export const logConfig: Configuration = {
         pattern: '[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] [%c] - %m',
       },
     },
+    download: {
+      type: 'dateFile',
+      filename: 'app_data/log/download/download.log',
+      pattern: 'yyyy-MM-dd',
+      category: 'DownloadService',
+      layout: {
+        type: 'pattern',
+        pattern: '[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] [%c] - %m',
+      },
+    },
     appLog: {
       type: 'dateFile',
-      filename: `logs/app.log`,
+      filename: `app_data/log/app/app.log`,
       pattern: 'yyyy-MM-dd',
       keepFileExt: true,
       compress: true,
@@ -45,7 +55,7 @@ export const logConfig: Configuration = {
     },
     errorFile: {
       type: 'dateFile',
-      filename: `logs/error.log`,
+      filename: `app_data/log/error/error.log`,
       alwaysIncludePattern: true,
       pattern: 'yyyy-MM-dd',
       keepFileExt: true,
@@ -67,6 +77,7 @@ export const logConfig: Configuration = {
       level: process.env.app_log_level || 'info',
     },
     http: { appenders: ['access'], level: 'info' },
+    download: { appenders: ['download'], level: 'info' },
   },
 };
 export const LoggerConfig = registerAs('logger', () => logConfig);

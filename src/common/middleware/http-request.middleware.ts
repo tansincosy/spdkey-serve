@@ -1,7 +1,9 @@
+import { secretMask } from '@/util';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Logger } from 'log4js';
 import { LoggerService } from '../service/log4j.service';
+import { cloneDeep } from 'lodash';
 @Injectable()
 export class HttpRequestMiddleware implements NestMiddleware {
   private log: Logger;
@@ -12,14 +14,19 @@ export class HttpRequestMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: () => void) {
     const code = res.statusCode; // 响应状态码
     next();
+    const requestBody = cloneDeep(req.body);
+    if (requestBody.password) {
+      requestBody.password = secretMask(requestBody.password);
+    }
     this.log.info(
-      `[${req.ip} ${req.method}  ${code}  ${req.url}] `,
-      'params ->',
+      'ip = %s, method = %s code = %s, url = %s,params = %s , query = %s, body = %s',
+      req.ip,
+      req.method,
+      code,
+      req.url,
       req.params,
-      'query ->',
       req.query,
-      'body ->',
-      req.body,
+      requestBody,
     );
   }
 }

@@ -17,10 +17,12 @@ import {
   UserModule,
 } from '@/module';
 import { CommonModule, HttpRequestMiddleware } from '@/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     CommonModule,
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,

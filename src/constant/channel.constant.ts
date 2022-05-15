@@ -11,4 +11,6 @@ export const ChannelReg = {
   TVG_LANGUAGE: /tvg-language="(.*?)"/,
   TVG_PLAY_URL: /(http|https).*?(.m3u8)/g,
   TVG_CHANNEL_NAME: /,(.*?)\n/,
+  XML_GROUP:
+    /<channel id="(.*)"><display-name>(.*)<\/display-name>.*?<icon src="(.*)"\/>.*?<url>(.*)<\/url>/,
 };

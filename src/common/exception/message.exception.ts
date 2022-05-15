@@ -54,4 +54,5 @@ export const BasicException = new Map<
   [BasicExceptionCode.DOWNLOAD_FILE_FAILED, 'download file failed'],
   [BasicExceptionCode.DOWNLOAD_FILE_TYPE_ERROR, 'download file type error'],
   [BasicExceptionCode.PARSER_FILE_FAILED, 'parse file failed'],
+  [BasicExceptionCode.HAS_TASK_DOWNLOADING, 'has download file task'],
 ]);

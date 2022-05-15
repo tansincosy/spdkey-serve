@@ -80,21 +80,6 @@ export class ChannelDAO {
     return this.prismaService.ePGUrl.findMany({});
   }
 
-  async batchAddEpgXmlChannels(epgChannels: EpgChannel[]) {
-    await this.prismaService.ePGSourceChannel.deleteMany({});
-    return this.prismaService.ePGSourceChannel.createMany({
-      data: epgChannels.map((item) => {
-        return {
-          name: item.name,
-          channelId: item.channelId || '',
-          logo: item.logo,
-          ePGUrlId: item.epgUrlId,
-        };
-      }),
-      skipDuplicates: true,
-    });
-  }
-
   getSearchParam(search) {
     let searchResult: any = {};
     searchResult = {

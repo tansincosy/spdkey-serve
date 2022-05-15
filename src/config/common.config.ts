@@ -9,8 +9,8 @@ export interface CommonConfig {
 }
 
 export const CommonConfig = registerAs(CONFIG_KEY.APP_CONFIG, () => ({
-  m3uPath: 'tmp/m3u',
-  logoPath: 'tmp/channel_logo',
-  programXMLPath: 'tmp/program',
-  allowChannelPath: 'tmp/allowChannels',
+  m3uPath: 'app_data/channel/m3u',
+  logoPath: 'app_data/channel/channel_logo',
+  programXMLPath: 'app_data/channel/program',
+  allowChannelPath: 'app_data/channel/all_channel',
 }));

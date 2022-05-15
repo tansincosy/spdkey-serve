@@ -1,11 +1,14 @@
 import { QueryParams } from '@/common';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class ParseUrlDTO {
   @IsString()
   @IsNotEmpty()
   @Matches(/(http:\/\/|https:\/\/).*\.m3u$/)
   url: string;
+
+  @IsBoolean()
+  isForceUpdate?: boolean;
 }
 
 export class QueryChannelSourceDTO extends QueryParams {
@@ -17,4 +20,7 @@ export class QueryChannelSourceDTO extends QueryParams {
   language?: string;
 }
 
-export class QueryChannelDTO extends QueryParams {}
+export class QueryChannelDTO extends QueryParams {
+  @IsBoolean({})
+  isForceUpdate?: boolean;
+}

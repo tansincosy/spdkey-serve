@@ -12,21 +12,30 @@ import {
   ChannelReg,
   CONFIG_KEY,
 } from '@/constant';
-import { getContentByRegex } from '@/util';
+import { getContentByRegex, moreThOne } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { readFile } from 'fs';
-import { existsSync, ensureDirSync, emptyDir } from 'fs-extra';
+import {
+  existsSync,
+  ensureDirSync,
+  emptyDir,
+  readFile,
+  readFileSync,
+} from 'fs-extra';
 import { join } from 'path';
 import { promisify } from 'util';
-import { M3U, M3uChannel } from './channel.type';
+import { EpgChannel, EpgUrl, M3U, M3uChannel } from './channel.type';
+import { exec } from 'child_process';
 
 const readFilePromise = promisify(readFile);
+const execPromise = promisify(exec);
 
 @Injectable()
 export class M3UService {
   private logger: Logger;
   private appConfig: CommonConfig;
+
+  private downloadEPGXMLPercent: number;
   constructor(
     private readonly loggerService: LoggerService,
     private readonly prismaService: PrismaService,
@@ -46,7 +55,7 @@ export class M3UService {
    */
   async findM3uByUrl(m3uUrl: string): Promise<M3U> {
     this.logger.info('findFileNameByUrl m3uUrl = %s ', m3uUrl);
-    const { name, id } = await this.prismaService.m3U.findFirst({
+    const m3uInfo = await this.prismaService.m3U.findFirst({
       where: {
         url: m3uUrl,
       },
@@ -55,7 +64,8 @@ export class M3UService {
         id: true,
       },
     });
-    return { name, id } || {};
+    this.logger.debug('result m3uInfo = %s', m3uInfo);
+    return m3uInfo || {};
   }
 
   async deleteM3uRecord(m3uUrl: string): Promise<void> {
@@ -227,31 +237,38 @@ export class M3UService {
           name: string;
           id: string;
         }>((resolve) => {
-          this.downloaderService
-            .downloadFile(item.logo, this.appConfig.logoPath)
-            .on('end', (dlFile) => {
-              this.logger.debug(
-                'downloadChannelLogo item = %s, index = %s',
-                item,
-                index,
-              );
-              this.logger.log(
-                'downloadChannelLogo percent = %s',
-                (index + 1) / readyDownloadSize,
-              );
-              resolve({
-                name: dlFile.fileName,
-                id: item.id,
+          if (item.logo) {
+            this.downloaderService
+              .downloadFile(item.logo, this.appConfig.logoPath)
+              .on('end', (dlFile) => {
+                this.logger.debug(
+                  'downloadChannelLogo item = %s, index = %s',
+                  item,
+                  index,
+                );
+                this.logger.info(
+                  'downloadChannelLogo percent = %s',
+                  (((index + 1) / readyDownloadSize) * 100).toFixed(2),
+                );
+                resolve({
+                  name: dlFile.fileName,
+                  id: item.id,
+                });
+              })
+              .start()
+              .catch((error) => {
+                this.logger.error('downloadChannelLogo error = %s', error);
+                resolve({
+                  name: '',
+                  id: item.id,
+                });
               });
-            })
-            .on('error', (err) => {
-              this.logger.error('downloadChannelLogo error = $s', err);
-              resolve({
-                name: '',
-                id: item.id,
-              });
-            })
-            .start();
+          } else {
+            resolve({
+              name: '',
+              id: item.id,
+            });
+          }
         });
       });
       const allDownloadFiles = await Promise.all(downloadPromises);
@@ -266,17 +283,21 @@ export class M3UService {
           },
         });
       });
-      await Promise.all(resultPromise);
-      this.logger.log('batch channelSource logo successful');
+      return Promise.all(resultPromise);
     }
+  }
+
+  getDownloadedPercent() {
+    return this.downloadEPGXMLPercent;
   }
 
   downloadEPGXML(epgXMlUrls: string[]) {
     ensureDirSync(this.appConfig.programXMLPath);
     emptyDir(this.appConfig.programXMLPath);
     const readyDownloadSize = epgXMlUrls.length;
-    epgXMlUrls.map((url, index) => {
-      new Promise((resolve) => {
+    this.downloadEPGXMLPercent = 0;
+    const downloadPromises = epgXMlUrls.map((url, index) => {
+      return new Promise<EpgUrl>((resolve) => {
         this.downloaderService
           .downloadFile(url, this.appConfig.programXMLPath)
           .on('end', (dlFile) => {
@@ -285,24 +306,89 @@ export class M3UService {
               url,
               index,
             );
-            this.logger.log(
-              'downloadChannelLogo percent = %s',
-              (index + 1) / readyDownloadSize,
+            this.downloadEPGXMLPercent = (index + 1) / readyDownloadSize;
+            this.logger.info(
+              'downloadEPGXML percent = %s',
+              this.downloadEPGXMLPercent.toFixed(2),
             );
             resolve({
               name: dlFile.fileName,
               url,
             });
           })
-          .on('error', (err) => {
-            this.logger.error('downloadChannelLogo error = $s', err);
+          .start()
+          .catch((error) => {
+            this.logger.error('downloadEPGXML error = $s', error);
             resolve({
               name: '',
               url,
             });
-          })
-          .start();
+          });
       });
+    });
+
+    return Promise.all(downloadPromises);
+  }
+
+  batchAddEpgXMUrl(epgUrls: EpgUrl[]) {
+    return this.prismaService.ePGUrl.createMany({
+      data: epgUrls.map(({ name, url }) => {
+        return {
+          url,
+          name,
+        };
+      }),
+      skipDuplicates: true,
+    });
+  }
+
+  async parseJSONForProgram(downloadFiles: EpgUrl[]) {
+    if (moreThOne(downloadFiles)) {
+      const { stdout } = await execPromise(
+        `sh scripts/merge_xml.sh ${this.appConfig.allowChannelPath}`,
+      );
+
+      this.logger.info('merge xml success!! stdout=', stdout);
+
+      const fileContent = readFileSync(
+        `${this.appConfig.allowChannelPath}/${stdout.trim()}`,
+        'utf-8',
+      );
+      const allowEPGs = await this.prismaService.ePGUrl.findMany({});
+      if (fileContent) {
+        const channelEpgs = fileContent.split('</channel').map((item) => {
+          const [, fileName] = item.match(/tmp\/program\/(.*):<channel/) || [];
+          const [, channelId, name, logo, url] =
+            item.match(ChannelReg.XML_GROUP) || [];
+          const allowEPG = allowEPGs.find((epg) => epg.name === fileName);
+          return {
+            epgUrlId: allowEPG?.id,
+            channelId,
+            name,
+            logo,
+            url,
+          };
+        }) as EpgChannel[];
+
+        return channelEpgs;
+      }
+      return [];
+    }
+    return [];
+  }
+
+  async batchAddEpgXmlChannels(epgChannels: EpgChannel[]) {
+    await this.prismaService.ePGSourceChannel.deleteMany({});
+    return this.prismaService.ePGSourceChannel.createMany({
+      data: epgChannels.map((item) => {
+        return {
+          name: item.name,
+          channelId: item.channelId || '',
+          logo: item.logo,
+          ePGUrlId: item.epgUrlId,
+        };
+      }),
+      skipDuplicates: true,
     });
   }
 }
