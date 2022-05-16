@@ -31,7 +31,7 @@ export const logConfig: Configuration = {
       type: 'dateFile',
       filename: 'app_data/log/download/download.log',
       pattern: 'yyyy-MM-dd',
-      category: 'DownloadService',
+      category: 'download',
       layout: {
         type: 'pattern',
         pattern: '[%d{yyyy-MM-dd hh:mm:ss.SSS}] [%p] [%c] - %m',

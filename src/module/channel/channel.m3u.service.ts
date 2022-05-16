@@ -35,7 +35,7 @@ export class M3UService {
   private logger: Logger;
   private appConfig: CommonConfig;
 
-  private downloadEPGXMLPercent: number;
+  private downloadEPGXMLPercent = 0;
   constructor(
     private readonly loggerService: LoggerService,
     private readonly prismaService: PrismaService,
@@ -271,7 +271,12 @@ export class M3UService {
           }
         });
       });
-      const allDownloadFiles = await Promise.all(downloadPromises);
+
+      const allDownloadFiles = [];
+
+      for await (const downloadObj of downloadPromises) {
+        allDownloadFiles.push(downloadObj);
+      }
 
       const resultPromise = allDownloadFiles.map((item) => {
         return this.prismaService.channelSource.update({
@@ -291,7 +296,7 @@ export class M3UService {
     return this.downloadEPGXMLPercent;
   }
 
-  downloadEPGXML(epgXMlUrls: string[]) {
+  async downloadEPGXML(epgXMlUrls: string[]) {
     ensureDirSync(this.appConfig.programXMLPath);
     emptyDir(this.appConfig.programXMLPath);
     const readyDownloadSize = epgXMlUrls.length;
@@ -326,8 +331,11 @@ export class M3UService {
           });
       });
     });
-
-    return Promise.all(downloadPromises);
+    const epgs: EpgUrl[] = [];
+    for await (const iterator of downloadPromises) {
+      epgs.push(iterator);
+    }
+    return epgs;
   }
 
   batchAddEpgXMUrl(epgUrls: EpgUrl[]) {

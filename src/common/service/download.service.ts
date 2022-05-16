@@ -10,7 +10,7 @@ import { ensureDirSync } from 'fs-extra';
 export class DownloadService {
   private log: Logger;
   constructor(private readonly logService: LoggerService) {
-    this.log = this.logService.getLogger(DownloadService.name);
+    this.log = this.logService.getLogger('download');
   }
 
   downloadFile(
@@ -25,7 +25,7 @@ export class DownloadService {
       fileName: (filename) => {
         return dateFile ? dayjs().format(dateFile) + `.${filename}` : filename;
       },
-      retry: { maxRetries: 3, delay: 3000 },
+      retry: { maxRetries: 1, delay: 3000 },
       override: { skip: isSkip },
     })
       .on('end', (d) => this.log.info('Download Completed', d))

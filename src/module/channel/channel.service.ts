@@ -1,5 +1,9 @@
 import { M3UService } from './channel.m3u.service';
-import { QueryChannelSourceDTO } from './channel.dto';
+import {
+  QueryChannelSourceDTO,
+  QueryChannelDTO,
+  ChannelQueryDTO,
+} from './channel.dto';
 import { Logger, LoggerService, BaseException, DeleteIdPrams } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
@@ -156,5 +160,9 @@ export class ChannelService {
       });
     }
     return {};
+  }
+
+  getChannels({ name }: ChannelQueryDTO) {
+    return [];
   }
 }

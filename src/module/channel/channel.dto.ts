@@ -24,3 +24,8 @@ export class QueryChannelDTO extends QueryParams {
   @IsBoolean({})
   isForceUpdate?: boolean;
 }
+
+export class ChannelQueryDTO extends QueryParams {
+  @IsString()
+  name: string;
+}

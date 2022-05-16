@@ -1,6 +1,10 @@
 import { DeleteIdPrams } from '@/common';
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
-import { ParseUrlDTO, QueryChannelSourceDTO } from './channel.dto';
+import {
+  ChannelQueryDTO,
+  ParseUrlDTO,
+  QueryChannelSourceDTO,
+} from './channel.dto';
 import { ChannelService } from './channel.service';
 
 @Controller('channel')
@@ -28,5 +32,10 @@ export class ChannelController {
   @Get('/source/percent')
   getPercent() {
     return this.channelService.getDownloadedPercent();
+  }
+
+  @Get()
+  getChannel(@Query() query: ChannelQueryDTO) {
+    return this.channelService.getChannels(query);
   }
 }
