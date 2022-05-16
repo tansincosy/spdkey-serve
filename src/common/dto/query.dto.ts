@@ -6,7 +6,7 @@ export class QueryParams {
   @IsString()
   pageSize?: string;
   @IsString()
-  id?: string;
+  id: string;
   @IsString()
   createdAt?: string;
   @IsString()

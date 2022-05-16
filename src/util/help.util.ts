@@ -1,3 +1,4 @@
+import { QueryParams } from '@/common';
 import {
   createCipheriv,
   createDecipheriv,
@@ -230,3 +231,42 @@ export const getContentByRegex = (
   }
   return '';
 };
+
+export function generatePaginationParams({
+  current,
+  pageSize,
+  createdAt,
+  updatedAt,
+  ...restParams
+}: QueryParams) {
+  let parseCurrent = 1;
+  if (current) {
+    parseCurrent = +current;
+  }
+  let parseSize = 20;
+  if (pageSize) {
+    parseSize = +pageSize;
+  }
+  const orderBy = getOrderBy(createdAt, updatedAt);
+
+  let searchResult: any = {};
+  searchResult = {
+    ...restParams,
+  };
+  if (restParams['name']) {
+    searchResult.name = {
+      contains: restParams['name'],
+    };
+  }
+
+  return {
+    take: parseSize,
+    skip: parseCurrent - 1,
+    orderBy: {
+      ...orderBy,
+    },
+    where: {
+      ...searchResult,
+    },
+  };
+}

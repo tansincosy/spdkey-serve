@@ -1,24 +1,36 @@
 import { isEmpty } from 'lodash';
-import { BaseException, LoggerService, Logger } from '@/common';
+import {
+  BaseException,
+  LoggerService,
+  Logger,
+  PrismaService,
+  Pagination,
+} from '@/common';
 import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import * as fs from 'fs';
-import { encrypt, encryptedWithPbkdf2, generateTemplateString } from '@/util';
+import {
+  encrypt,
+  encryptedWithPbkdf2,
+  generateTemplateString,
+  generatePaginationParams,
+} from '@/util';
 import { CryptoConfig } from '@/config';
 import { Request, Response } from 'express';
 import { Cache } from 'cache-manager';
 import { Token } from 'oauth2-server';
 import { format } from 'util';
 import { UserDao } from './user.dao';
-import { RegisterParam } from './user.dto';
+import { RegisterParam, UserQueryParam } from './user.dto';
 import {
   BasicExceptionCode,
   TOKEN_FORMAT,
   UserExceptionCode,
 } from '@/constant';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -27,6 +39,7 @@ export class UserService {
     private readonly loggerService: LoggerService,
     private readonly userDao: UserDao,
     private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {
@@ -207,5 +220,21 @@ export class UserService {
     }
 
     resp.status(HttpStatus.OK).json(findUserResult);
+  }
+
+  async getUsers(userQueryParams: UserQueryParam): Promise<Pagination<User[]>> {
+    this.log.info('getUsers userQueryParams = %s', userQueryParams);
+    const [total, data] = await this.prismaService.$transaction([
+      this.prismaService.user.count(),
+      this.prismaService.user.findMany(
+        generatePaginationParams(userQueryParams),
+      ),
+    ]);
+    return {
+      total,
+      data,
+      pageSize: userQueryParams.pageSize,
+      pageNumber: userQueryParams.current,
+    };
   }
 }

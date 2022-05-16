@@ -14,6 +14,7 @@ import {
   ChannelModule,
   ConfigureModule,
   DeviceModule,
+  ProgramModule,
   UserModule,
 } from '@/module';
 import { CommonModule, HttpRequestMiddleware } from '@/common';
@@ -40,6 +41,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AuthModule,
     ConfigureModule,
     ChannelModule,
+    ProgramModule,
   ],
   controllers: [AppController],
   providers: [AppService],

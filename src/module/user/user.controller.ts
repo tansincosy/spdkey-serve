@@ -4,13 +4,14 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
-import { RegisterParam } from './user.dto';
+import { RegisterParam, UserQueryParam } from './user.dto';
 import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
@@ -29,5 +30,10 @@ export class UserController {
   @UseGuards(AuthGuard)
   getCurrentUser(@Req() req: Request, @Res() resp: Response) {
     this.userService.getCurrentUser(req, resp);
+  }
+
+  @Get()
+  getUsers(@Query() userQuery: UserQueryParam) {
+    return this.userService.getUsers(userQuery);
   }
 }

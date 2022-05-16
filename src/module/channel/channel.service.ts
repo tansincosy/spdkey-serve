@@ -1,14 +1,11 @@
 import { M3UService } from './channel.m3u.service';
-import {
-  QueryChannelSourceDTO,
-  QueryChannelDTO,
-  ChannelQueryDTO,
-} from './channel.dto';
+import { QueryChannelSourceDTO, ChannelQueryDTO } from './channel.dto';
 import { Logger, LoggerService, BaseException, DeleteIdPrams } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
 import { BasicExceptionCode } from '@/constant';
 import { moreThOne } from '@/util';
+import { M3U } from './channel.type';
 
 @Injectable()
 export class ChannelService {
@@ -87,6 +84,24 @@ export class ChannelService {
     };
   }
 
+  async downloadChannelLogo(m3uSourceData: string[], m3uInfo: M3U) {
+    if (m3uSourceData.length > 0) {
+      this.logger.info('begin save m3u data');
+      const channels = this.m3UService.m3uChannelToJson(m3uSourceData);
+      await this.m3UService.batchAddChannelSource(
+        channels.map((channelSourceItem) => ({
+          ...channelSourceItem,
+          m3UId: m3uInfo.id,
+        })),
+      );
+      const channelSources = await this.m3UService.getAllM3U();
+      this.logger.info('begin download channel logo');
+      this.m3UService.downloadChannelLogo(channelSources).then((resp) => {
+        this.logger.log('download logo successful,filename = %s', resp);
+      });
+    }
+  }
+
   async contrSourceChannelData(m3uUrl: string, isForceUpdate: boolean) {
     if (isForceUpdate) {
       await this.m3UService.deleteM3uRecord(m3uUrl);
@@ -124,21 +139,9 @@ export class ChannelService {
     const { m3uSourceData, epgXmlData } = await this.m3UService.parseM3u(
       m3uInfo.name,
     );
-    if (m3uSourceData.length > 0) {
-      this.logger.info('begin save m3u data');
-      const channels = this.m3UService.m3uChannelToJson(m3uSourceData);
-      await this.m3UService.batchAddChannelSource(
-        channels.map((channelSourceItem) => ({
-          ...channelSourceItem,
-          m3UId: m3uInfo.id,
-        })),
-      );
-      const channelSources = await this.m3UService.getAllM3U();
-      this.logger.info('begin download channel logo');
-      this.m3UService.downloadChannelLogo(channelSources).then((resp) => {
-        this.logger.log('download logo successful,filename = %s', resp);
-      });
-    }
+
+    this.downloadChannelLogo(m3uSourceData, m3uInfo);
+
     if (epgXmlData) {
       const epgUrls = epgXmlData.split(',') || [];
       this.m3UService.downloadEPGXML(epgUrls).then(async (epgFiles) => {

@@ -1,3 +1,4 @@
+import { QueryParams } from '@/common';
 import {
   IsEmail,
   IsNotEmpty,
@@ -60,4 +61,8 @@ export class ModifyParam {
   @IsString()
   @IsNotEmpty()
   authCode: string;
+}
+
+export class UserQueryParam extends QueryParams {
+  username?: string;
 }
