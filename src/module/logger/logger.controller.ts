@@ -11,7 +11,7 @@ import {
 import { AuthGuard } from '../auth/auth.guard';
 import { LoggerService } from './logger.service';
 
-@Controller('logger')
+@Controller('operation-log')
 export class LoggerController {
   constructor(private readonly loggerService: LoggerService) {}
 
