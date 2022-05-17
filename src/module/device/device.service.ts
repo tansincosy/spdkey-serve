@@ -33,7 +33,7 @@ export class DeviceService {
 
     await this.deviceDao.saveGrantOnDevice(id, ...grantIds);
 
-    return { deviceSecret };
+    return { deviceSecret, id };
   }
 
   async updateDevice(device: DeviceDTO) {

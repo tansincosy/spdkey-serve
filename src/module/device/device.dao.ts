@@ -146,6 +146,7 @@ export class DeviceDao {
         isOnline: device.isOnline,
         os: device.os,
         engine: device.engine,
+        isLocked: device.isLocked,
         accessTokenValidateSeconds: device.accessTokenValidateSeconds,
         refreshTokenValidateSeconds: device.refreshTokenValidateSeconds,
       },
