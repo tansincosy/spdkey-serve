@@ -37,45 +37,43 @@ export class DeviceDao {
     return client;
   }
 
-  async findUserDeviceByClientIdAndUserId(deviceId: string, userId: string) {
+  upsertDevice(deviceId: string, userId: string) {
     this.logger.info(
-      '[findUserDeviceByClientIdAndUserId] deviceId >>',
+      '[delUserOnDevice] deviceId >>',
       deviceId,
       'userId>>>',
       userId,
     );
-    const hasUserLinkClient = await this.prismaService.device.findFirst({
-      where: {
-        deviceId,
+    return this.prismaService.userOnDevice.upsert({
+      create: {
         userId,
+        deviceId,
+      },
+      update: {
+        updatedAt: new Date().toISOString(),
+      },
+      where: {
+        userId_deviceId: {
+          userId,
+          deviceId,
+        },
       },
     });
-    this.logger.debug(
-      '[findUserDeviceByClientIdAndUserId] hasUserLinkClient >>>',
-      hasUserLinkClient,
-    );
-    return hasUserLinkClient;
   }
 
-  async saveDeviceLinkUserWithClientIdAndUserId(
-    deviceId: string,
-    userId: string,
-  ) {
+  insertUserOnDevice(deviceId: string, userId: string) {
     this.logger.info(
-      '[saveDeviceLinkUserWithClientIdAndUserId] deviceId >>',
+      '[insertUserOnDevice] deviceId >>',
       deviceId,
       'userId>>>',
       userId,
     );
-    await this.prismaService.device.create({
+    return this.prismaService.userOnDevice.create({
       data: {
-        deviceId,
         userId,
+        deviceId,
       },
     });
-    this.logger.info(
-      '[saveDeviceLinkUserWithClientIdAndUserId] save successFully',
-    );
   }
 
   async saveDevice(device: DeviceDTO) {

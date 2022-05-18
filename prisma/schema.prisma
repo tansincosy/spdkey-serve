@@ -12,7 +12,7 @@ datasource db {
 
 // scope 表
 model Scope {
-  id        String        @id @default(uuid())
+  id        String        @id @default(cuid())
   updatedAt DateTime      @default(now()) @map("updated_at")
   createdAt DateTime      @default(now()) @map("created_at")
   name      String?
@@ -34,7 +34,7 @@ model ScopeOnUser {
 
 //用户表
 model User {
-  id          String         @id @default(uuid())
+  id          String         @id @default(cuid())
   updatedAt   DateTime       @default(now()) @map("updated_at")
   createdAt   DateTime       @default(now()) @map("created_at")
   username    String?        @unique @default("")
@@ -47,12 +47,12 @@ model User {
   devices     UserOnDevice[]
   deviceLimit Int?           @default(5) @map("device_limit")
 
-  Device Device[]
   @@map("zap_tb_user")
 }
 
 model UserOnDevice {
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
   userId    String   @map("user_id")
   deviceId  String   @map("device_id")
 
@@ -63,7 +63,7 @@ model UserOnDevice {
 }
 
 model Grant {
-  id        String          @id @default(uuid())
+  id        String          @id @default(cuid())
   updatedAt DateTime        @default(now()) @map("updated_at")
   createdAt DateTime        @default(now()) @map("created_at")
   name      String?         @unique @default("")
@@ -84,7 +84,7 @@ model GrantOnDevice {
 }
 
 model Device {
-  id                          String          @id @default(uuid())
+  id                          String          @id @default(cuid())
   updatedAt                   DateTime        @default(now()) @map("updated_at")
   createdAt                   DateTime        @default(now()) @map("created_at")
   name                        String?         @default("")
@@ -100,13 +100,11 @@ model Device {
   isOnline                    Int?            @default(1) @map("is_online") @db.TinyInt
   grants                      GrantOnDevice[]
 
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
   @@map("zap_tb_device")
 }
 
 model Config {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   name      String   @unique @default("")
   value     String   @db.Text
   createdAt DateTime @default(now()) @map("created_at")
@@ -120,7 +118,7 @@ model Config {
 }
 
 model ConfigType {
-  id      String   @id @default(uuid())
+  id      String   @id @default(cuid())
   name    String   @unique @default("")
   configs Config[]
 
@@ -128,7 +126,7 @@ model ConfigType {
 }
 
 model Channel {
-  id        String    @id @default(uuid())
+  id        String    @id @default(cuid())
   name      String    @unique @default("")
   channelId String?   @default("") @map("channel_id")
   createdAt DateTime  @default(now()) @map("created_at")
@@ -141,7 +139,7 @@ model Channel {
 }
 
 model PlayUrl {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   name      String   @unique @default("")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
@@ -153,7 +151,7 @@ model PlayUrl {
 }
 
 model Program {
-  id        String  @id @default(uuid())
+  id        String  @id @default(cuid())
   name      String  @unique @default("")
   introduce String? @db.Text
 

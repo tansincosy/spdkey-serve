@@ -273,19 +273,10 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       userScope: user.scope,
     };
 
-    const hasUserLinkClient =
-      await this.deviceDao.findUserDeviceByClientIdAndUserId(
-        client.id,
-        user.id,
-      );
-
-    if (isEmpty(hasUserLinkClient)) {
-      this.logger.info('[saveToken] update client link user id');
-      await this.deviceDao.saveDeviceLinkUserWithClientIdAndUserId(
-        client.id,
-        user.id,
-      );
-    }
+    await this.deviceDao.upsertDevice(
+      client.id, //原始id
+      user.id,
+    );
 
     const redisAccessKey = format(formats.token, token.accessToken);
     const redisRefreshKey = format(formats.token, token.refreshToken);
