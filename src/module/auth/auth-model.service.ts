@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import OAuth2Server, {
   Client,
   Falsey,
-  InvalidClientError,
+  InvalidTokenError,
   PasswordModel,
   RefreshToken,
   RefreshTokenModel,
@@ -80,13 +80,12 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
   async revokeTokenForLogin(req: Request) {
     const authorization = req.headers.authorization;
 
-    const accessToken = req.body.accessToken;
+    const clientBasic64 = req.body.client;
 
-    const [tokenType, clientBasic64] = authorization.split(' ');
-    if (tokenType !== 'Basic') {
-      throw new InvalidClientError(
-        'Invalid client: cannot retrieve client credentials',
-      );
+    const [tokenType, accessToken] = authorization.split(' ');
+
+    if (tokenType !== 'Bearer') {
+      throw new InvalidTokenError('Invalid token: access token is error');
     }
     const clientTokenStr = atob(clientBasic64);
     const [clientId, clientSecret] = clientTokenStr.split(':');

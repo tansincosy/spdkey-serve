@@ -203,15 +203,19 @@ export class UserService {
     const headers = req.headers;
     const token = headers.authorization;
     let findUserResult = {};
+    this.log.info('[getCurrentUser] token = %s', token);
     if (token) {
       const [, tokenStr] = token.split(' ');
       const getAccessTokenValue = await this.cacheManager.get<Token>(
         format(TOKEN_FORMAT.token, tokenStr),
       );
       if (getAccessTokenValue) {
-        this.log.debug('getAccessTokenValue = ', getAccessTokenValue);
+        this.log.debug(
+          '[getCurrentUser] getAccessTokenValue = ',
+          getAccessTokenValue,
+        );
         const { userId } = getAccessTokenValue;
-        findUserResult = this.userDao.findUserById(userId);
+        findUserResult = await this.userDao.findUserById(userId);
       } else {
         this.log.warn('[getCurrentUser] getAccessTokenValue is null');
       }
