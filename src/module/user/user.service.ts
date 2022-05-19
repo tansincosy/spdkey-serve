@@ -5,6 +5,7 @@ import {
   Logger,
   PrismaService,
   Pagination,
+  QueryPagination,
 } from '@/common';
 import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
@@ -17,6 +18,9 @@ import {
   encryptedWithPbkdf2,
   generateTemplateString,
   generatePaginationParams,
+  generateQueryParam,
+  likeQuery,
+  excludePagination,
 } from '@/util';
 import { CryptoConfig } from '@/config';
 import { Request, Response } from 'express';
@@ -33,7 +37,7 @@ import {
 import { User } from '@prisma/client';
 
 @Injectable()
-export class UserService {
+export class UserService implements QueryPagination<UserQueryParam, User> {
   private log: Logger;
   constructor(
     private readonly loggerService: LoggerService,
@@ -226,19 +230,38 @@ export class UserService {
     resp.status(HttpStatus.OK).json(findUserResult);
   }
 
-  async getUsers(userQueryParams: UserQueryParam): Promise<Pagination<User[]>> {
-    this.log.info('getUsers userQueryParams = %s', userQueryParams);
+  async pageList(query: UserQueryParam): Promise<Pagination<Partial<User>[]>> {
+    this.log.info('getUsers userQueryParams = %s', query);
+
+    const pageParams = generateQueryParam(query);
+    const where = {
+      ...likeQuery<UserQueryParam>(query, 'username'),
+      ...excludePagination(query),
+    };
     const [total, data] = await this.prismaService.$transaction([
-      this.prismaService.user.count(),
-      this.prismaService.user.findMany(
-        generatePaginationParams(userQueryParams),
-      ),
+      this.prismaService.user.count({
+        ...pageParams,
+        where,
+      }),
+      this.prismaService.user.findMany({
+        ...pageParams,
+        where,
+        select: {
+          id: true,
+          updatedAt: true,
+          username: true,
+          email: true,
+          createdAt: true,
+          isLocked: true,
+          isValid: true,
+        },
+      }),
     ]);
     return {
       total,
       data,
-      pageSize: userQueryParams.pageSize,
-      pageNumber: userQueryParams.current,
+      pageSize: query.pageSize,
+      pageNumber: query.current,
     };
   }
 }

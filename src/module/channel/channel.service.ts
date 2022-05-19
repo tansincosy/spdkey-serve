@@ -1,14 +1,28 @@
 import { M3UService } from './channel.m3u.service';
-import { QueryChannelSourceDTO, ChannelQueryDTO } from './channel.dto';
-import { Logger, LoggerService, BaseException, DeleteIdPrams } from '@/common';
+import {
+  QueryChannelSourceDTO,
+  ChannelQueryDTO,
+  QueryChannelDTO,
+} from './channel.dto';
+import {
+  Logger,
+  LoggerService,
+  BaseException,
+  DeleteIdPrams,
+  QueryPagination,
+  Pagination,
+} from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
 import { BasicExceptionCode } from '@/constant';
 import { moreThOne } from '@/util';
 import { M3U } from './channel.type';
+import { ChannelSource } from '@prisma/client';
 
 @Injectable()
-export class ChannelService {
+export class ChannelService
+  implements QueryPagination<QueryChannelSourceDTO, ChannelSource>
+{
   private logger: Logger;
   private downloading = false;
   constructor(
@@ -17,6 +31,12 @@ export class ChannelService {
     private readonly m3UService: M3UService,
   ) {
     this.logger = this.loggerService.getLogger(ChannelService.name);
+  }
+
+  pageList(
+    query: QueryChannelSourceDTO,
+  ): Promise<Pagination<Partial<ChannelSource>[]>> {
+    throw new Error('Method not implemented.');
   }
 
   OnModuleInit() {

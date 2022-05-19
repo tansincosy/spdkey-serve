@@ -34,6 +34,6 @@ export class UserController {
 
   @Get()
   getUsers(@Query() userQuery: UserQueryParam) {
-    return this.userService.getUsers(userQuery);
+    return this.userService.pageList(userQuery);
   }
 }

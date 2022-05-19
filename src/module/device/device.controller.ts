@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { DeviceDTO } from './device.dto';
+import { DeviceDTO, DeviceParams } from './device.dto';
 import { DeviceService } from './device.service';
 
 @Controller('device')
@@ -29,8 +29,8 @@ export class DeviceController {
 
   @Get()
   @UseGuards(AuthGuard)
-  getClient(@Query() { current, pageSize, id }: QueryParams) {
-    return this.deviceService.getList({ current, pageSize, id });
+  getClient(@Query() queryParam: DeviceParams) {
+    return this.deviceService.pageList(queryParam);
   }
 
   @Delete()

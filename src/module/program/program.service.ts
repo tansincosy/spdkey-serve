@@ -1,21 +1,38 @@
-import { Logger, LoggerService, Pagination, PrismaService } from '@/common';
-import { generatePaginationParams } from '@/util';
+import { excludePagination, generateQueryParam, likeQuery } from '@/util';
+import {
+  Logger,
+  LoggerService,
+  Pagination,
+  PrismaService,
+  QueryPagination,
+} from '@/common';
 import { Injectable } from '@nestjs/common';
 import { Program } from '@prisma/client';
 import { ProgramDTO } from './program.dto';
 
 @Injectable()
-export class ProgramService {
+export class ProgramService implements QueryPagination<ProgramDTO, Program> {
   private Log: Logger;
   constructor(private log: LoggerService, private readonly db: PrismaService) {
     this.Log = this.log.getLogger(ProgramService.name);
   }
 
-  async getPlaybills(query: ProgramDTO): Promise<Pagination<Program[]>> {
+  async pageList(query: ProgramDTO): Promise<Pagination<Partial<Program>[]>> {
     this.Log.info('getPlaybills query = %s', query);
+    const queryParam = generateQueryParam(query);
+    const where = {
+      ...excludePagination(query),
+      ...likeQuery<Program>(query, 'name'),
+    };
     const [total, playbills] = await this.db.$transaction([
-      this.db.program.count(),
-      this.db.program.findMany(generatePaginationParams(query)),
+      this.db.program.count({
+        ...queryParam,
+        where,
+      }),
+      this.db.program.findMany({
+        ...queryParam,
+        where,
+      }),
     ]);
     return {
       total,

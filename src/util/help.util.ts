@@ -7,6 +7,7 @@ import {
   randomBytes,
   randomUUID,
 } from 'crypto';
+import { cloneDeep } from 'lodash';
 const algorithm = 'aes-256-cbc';
 const iv = randomBytes(16);
 export type Edge<T> = {
@@ -232,6 +233,42 @@ export const getContentByRegex = (
   return '';
 };
 
+export function generateQueryParam(params: QueryParams) {
+  const { current, pageSize, createdAt, updatedAt } = params;
+  if (!current || !pageSize) {
+    return {};
+  }
+
+  const pageNum = current || 1;
+  const take = pageSize || 20;
+
+  const query = {
+    take: Number(take),
+    skip: Number(pageNum) - 1,
+    orderBy: {
+      ...getOrderBy(createdAt, updatedAt),
+    },
+  };
+  return query;
+}
+
+export function excludePagination(param: QueryParams) {
+  const newParam = cloneDeep(param);
+  delete newParam.pageSize;
+  delete newParam.current;
+  return newParam;
+}
+
+export function likeQuery<T>(params: any, pickKey: keyof T) {
+  const queryParam = {} as Record<keyof T, any>;
+  if (params[pickKey]) {
+    queryParam[pickKey] = {
+      contains: params[pickKey],
+    };
+  }
+  return queryParam;
+}
+
 export function generatePaginationParams({
   current,
   pageSize,
@@ -258,7 +295,6 @@ export function generatePaginationParams({
       contains: restParams['name'],
     };
   }
-
   return {
     take: parseSize,
     skip: parseCurrent - 1,

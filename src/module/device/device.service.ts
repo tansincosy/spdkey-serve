@@ -1,16 +1,22 @@
-import { LoggerService, Logger, PageInfoNumber, QueryParams } from '@/common';
+import { LoggerService, Logger, Pagination, QueryPagination } from '@/common';
 import { Injectable } from '@nestjs/common';
+import { Device } from '@prisma/client';
 import { DeviceDao } from './device.dao';
-import { DeviceDTO } from './device.dto';
+import { DeviceDTO, DeviceParams } from './device.dto';
 
 @Injectable()
-export class DeviceService {
+export class DeviceService implements QueryPagination<DeviceParams, Device> {
   private logger: Logger;
   constructor(
     private readonly loggerService: LoggerService,
     private readonly deviceDao: DeviceDao,
   ) {
     this.logger = this.loggerService.getLogger(DeviceService.name);
+  }
+
+  pageList(query: DeviceParams): Promise<Pagination<Partial<Device>[]>> {
+    this.logger.info('[get]::: enter');
+    return this.deviceDao.pageList(query);
   }
 
   async saveDevice(device: DeviceDTO) {
@@ -38,26 +44,6 @@ export class DeviceService {
 
   async updateDevice(device: DeviceDTO) {
     return this.deviceDao.updateDevice(device);
-  }
-
-  async getList({
-    pageSize,
-    current,
-    id,
-  }: QueryParams): Promise<
-    DeviceDTO | DeviceDTO[] | PageInfoNumber<DeviceDTO[]>
-  > {
-    if (id) {
-      this.logger.info('[get]::: findUnique ');
-      const foundDevice = await this.deviceDao.getDeviceById(id);
-      return {
-        ...foundDevice,
-        grants: foundDevice.grants.map(({ grant }) => grant.name),
-      };
-    }
-
-    this.logger.info('[get]::: enter');
-    return this.deviceDao.getDeviceListForPage(pageSize, current);
   }
 
   async delete(ids: { ids: string[] }) {

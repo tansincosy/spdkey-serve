@@ -9,6 +9,6 @@ export class ProgramController {
 
   @Get()
   getPlaybills(@Query() playbillQuery: ProgramDTO) {
-    return this.programService.getPlaybills(playbillQuery);
+    return this.programService.pageList(playbillQuery);
   }
 }

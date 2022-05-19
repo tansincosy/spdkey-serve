@@ -1,12 +1,23 @@
-import { LoggerService, PrismaService, Logger, PageInfoNumber } from '@/common';
+import {
+  LoggerService,
+  PrismaService,
+  Logger,
+  Pagination,
+  QueryPagination,
+} from '@/common';
 import { DeviceLineStatus, DeviceLock } from '@/constant';
-import { encryptedWithPbkdf2 } from '@/util';
+import {
+  encryptedWithPbkdf2,
+  excludePagination,
+  generateQueryParam,
+  likeQuery,
+} from '@/util';
 import { Injectable } from '@nestjs/common';
 import { Device } from '@prisma/client';
-import { DeviceDTO } from './device.dto';
+import { DeviceDTO, DeviceParams } from './device.dto';
 
 @Injectable()
-export class DeviceDao {
+export class DeviceDao implements QueryPagination<DeviceParams, Device> {
   private logger: Logger;
   constructor(
     private readonly prismaService: PrismaService,
@@ -177,25 +188,41 @@ export class DeviceDao {
     return deviceInfo;
   }
 
-  async getDeviceListForPage(
-    pageSize: string,
-    current: string,
-  ): Promise<PageInfoNumber<Device[]>> {
+  async pageList(query: DeviceParams): Promise<Pagination<Partial<Device>[]>> {
+    const where = {
+      ...excludePagination(query),
+      ...likeQuery<Device>(query, 'name'),
+    };
+    const queryPage = generateQueryParam(query);
     const [data, total] = await this.prismaService.$transaction([
       this.prismaService.device.findMany({
-        take: +pageSize,
-        skip: +current - 1,
-        orderBy: {
-          createdAt: 'desc',
+        ...queryPage,
+        where,
+        select: {
+          accessTokenValidateSeconds: true,
+          createdAt: true,
+          deviceId: true,
+          engine: true,
+          id: true,
+          isLocked: true,
+          isOnline: true,
+          name: true,
+          os: true,
+          refreshTokenValidateSeconds: true,
+          type: true,
+          updatedAt: true,
         },
       }),
-      this.prismaService.device.count(),
+      this.prismaService.device.count({
+        ...queryPage,
+        where,
+      }),
     ]);
     return {
       total,
       data,
-      pageSize: +pageSize,
-      pageNumber: +current,
+      pageSize: query.pageSize,
+      pageNumber: query.current,
     };
   }
 

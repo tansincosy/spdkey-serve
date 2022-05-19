@@ -1,3 +1,4 @@
+import { QueryParams } from '@/common';
 import { IsNumber, IsString } from 'class-validator';
 
 export class DeviceDTO {
@@ -5,7 +6,6 @@ export class DeviceDTO {
   isOnline?: number;
   @IsNumber()
   isLocked?: number;
-  id?: string;
   @IsString()
   readonly deviceId: string;
   @IsString()
@@ -22,4 +22,14 @@ export class DeviceDTO {
   accessTokenValidateSeconds?: number;
   @IsNumber()
   refreshTokenValidateSeconds?: number;
+  id?: string;
+}
+
+export class DeviceParams extends QueryParams {
+  @IsString()
+  readonly name: string;
+  @IsNumber()
+  isOnline?: number;
+  @IsNumber()
+  isLocked?: number;
 }
