@@ -73,7 +73,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       case exception instanceof PrismaClientKnownRequestError:
         response.status(HttpStatus.BAD_REQUEST).json({
           errorCode: exception.code,
-          errorMessage: exception.meta.target,
+          errorMessage: exception.meta?.target,
         });
         break;
       case exception instanceof NotFoundException:

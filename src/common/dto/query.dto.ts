@@ -1,4 +1,4 @@
-import { IsArray, IsString } from 'class-validator';
+import { IsArray, IsDefined, IsString } from 'class-validator';
 
 export class QueryParams {
   @IsString()
@@ -15,5 +15,6 @@ export class QueryParams {
 
 export class DeleteIdPrams {
   @IsArray()
+  @IsDefined()
   ids: string[];
 }

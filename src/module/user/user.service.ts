@@ -17,7 +17,6 @@ import {
   encrypt,
   encryptedWithPbkdf2,
   generateTemplateString,
-  generatePaginationParams,
   generateQueryParam,
   likeQuery,
   excludePagination,
@@ -48,6 +47,10 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
     private readonly cacheManager: Cache,
   ) {
     this.log = this.loggerService.getLogger(UserService.name);
+  }
+
+  batchDelUser(ids: string[]) {
+    return this.userDao.batchDelUser(ids);
   }
 
   /**
@@ -254,6 +257,7 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
           createdAt: true,
           isLocked: true,
           isValid: true,
+          deviceLimit: true,
         },
       }),
     ]);
@@ -263,5 +267,9 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
       pageSize: query.pageSize,
       pageNumber: query.current,
     };
+  }
+
+  getUserDetail(id: string) {
+    return this.userDao.getUserDetail(id);
   }
 }

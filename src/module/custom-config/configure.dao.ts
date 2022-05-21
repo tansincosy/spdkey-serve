@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LoggerService, PageInfoNumber, PrismaService, Logger } from '@/common';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash';
 import { Config } from './configure.dto';
 
 @Injectable()

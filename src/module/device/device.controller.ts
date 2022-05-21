@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -33,8 +34,14 @@ export class DeviceController {
     return this.deviceService.pageList(queryParam);
   }
 
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  getClientDetail(@Param('id') id: string) {
+    return this.deviceService.getDeviceDetail(id);
+  }
+
   @Delete()
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   deleteClient(@Body() { ids }: { ids: string[] }) {
     return this.deviceService.delete({ ids });
   }

@@ -1,6 +1,8 @@
+import { DeleteIdPrams } from '@/common';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -35,5 +37,15 @@ export class UserController {
   @Get()
   getUsers(@Query() userQuery: UserQueryParam) {
     return this.userService.pageList(userQuery);
+  }
+
+  @Get(':id')
+  getUserDetail(@Param('id') id: string) {
+    return this.userService.getUserDetail(id);
+  }
+
+  @Delete()
+  batchDelUser(@Body() { ids }: DeleteIdPrams) {
+    return this.userService.batchDelUser(ids);
   }
 }

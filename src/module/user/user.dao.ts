@@ -133,4 +133,96 @@ export class UserDao {
       },
     });
   }
+
+  async getUserDetail(id: string) {
+    this.logger.debug('getUserDetail id = %s', id);
+    const userDetail = await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        isLocked: true,
+        isValid: true,
+        updatedAt: true,
+        createdAt: true,
+        scopes: {
+          select: {
+            scope: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        devices: {
+          select: {
+            Device: {
+              select: {
+                name: true,
+                isOnline: true,
+                isLocked: true,
+                id: true,
+                type: true,
+              },
+            },
+          },
+        },
+        deviceLimit: true,
+      },
+    });
+
+    return {
+      ...userDetail,
+      devices: userDetail.devices.map((item) => {
+        return {
+          name: item.Device.name,
+          isOnline: item.Device.isOnline,
+          isLocked: item.Device.isLocked,
+          type: item.Device.type,
+          id: item.Device.id,
+        };
+      }),
+      scopes: userDetail.scopes.map((item) => {
+        return item.scope.name;
+      }),
+    };
+  }
+
+  async batchDelUser(ids: string[]) {
+    this.logger.info('batchDelUser ids = %s', ids);
+    const delUser = this.prismaService.user.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+    const delUserOnDevice = this.prismaService.userOnDevice.deleteMany({
+      where: {
+        userId: {
+          in: ids,
+        },
+      },
+    });
+
+    const delUserOnScope = this.prismaService.scopeOnUser.deleteMany({
+      where: {
+        userId: {
+          in: ids,
+        },
+      },
+    });
+
+    await this.prismaService.$transaction([
+      delUserOnDevice,
+      delUserOnScope,
+      delUser,
+    ]);
+    this.logger.info('batchDelUser success');
+    return {};
+  }
 }

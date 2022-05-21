@@ -19,6 +19,10 @@ export class DeviceService implements QueryPagination<DeviceParams, Device> {
     return this.deviceDao.pageList(query);
   }
 
+  async getDeviceDetail(id: string) {
+    return this.deviceDao.getDeviceDetail(id);
+  }
+
   async saveDevice(device: DeviceDTO) {
     this.logger.info('[saveDevice] enter');
 

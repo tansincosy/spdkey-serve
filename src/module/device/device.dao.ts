@@ -227,23 +227,73 @@ export class DeviceDao implements QueryPagination<DeviceParams, Device> {
   }
 
   async batchDeleteDevice(deviceIdObj: { ids: string[] }) {
+    const userOnDevice = this.prismaService.userOnDevice.deleteMany({
+      where: {
+        deviceId: {
+          in: deviceIdObj.ids,
+        },
+      },
+    });
+    const delDeviceOnGrant = this.prismaService.grantOnDevice.deleteMany({
+      where: {
+        deviceId: {
+          in: deviceIdObj.ids,
+        },
+      },
+    });
+
+    const delDevice = this.prismaService.device.deleteMany({
+      where: {
+        id: {
+          in: deviceIdObj.ids,
+        },
+      },
+    });
+
     await this.prismaService.$transaction([
-      this.prismaService.grantOnDevice.deleteMany({
-        where: {
-          deviceId: {
-            in: deviceIdObj.ids,
-          },
-        },
-      }),
-      this.prismaService.device.deleteMany({
-        where: {
-          id: {
-            in: deviceIdObj.ids,
-          },
-        },
-      }),
+      userOnDevice,
+      delDeviceOnGrant,
+      delDevice,
     ]);
     this.logger.info('[batchDeleteDevice] batchDeleteDevice successfully!!');
     return {};
+  }
+
+  async getDeviceDetail(id: string) {
+    this.logger.info('[getDeviceDetail] id = %s', id);
+    const deviceInfo = await this.prismaService.device.findUnique({
+      select: {
+        id: true,
+        accessTokenValidateSeconds: true,
+        createdAt: true,
+        deviceId: true,
+        engine: true,
+        isLocked: true,
+        isOnline: true,
+        name: true,
+        os: true,
+        refreshTokenValidateSeconds: true,
+        type: true,
+        updatedAt: true,
+        grants: {
+          select: {
+            grant: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        id,
+      },
+    });
+
+    this.logger.info('[getDeviceDetail] get client detail  successfully!!');
+    return {
+      ...deviceInfo,
+      grants: deviceInfo?.grants.map((item) => item.grant.name) || [],
+    };
   }
 }

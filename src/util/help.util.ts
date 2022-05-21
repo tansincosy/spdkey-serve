@@ -254,8 +254,9 @@ export function generateQueryParam(params: QueryParams) {
 
 export function excludePagination(param: QueryParams) {
   const newParam = cloneDeep(param);
-  delete newParam.pageSize;
-  delete newParam.current;
+  if (newParam.pageSize) delete newParam.pageSize;
+  if (newParam.current) delete newParam.current;
+  if (newParam.id) delete newParam.id;
   return newParam;
 }
 
@@ -267,42 +268,4 @@ export function likeQuery<T>(params: any, pickKey: keyof T) {
     };
   }
   return queryParam;
-}
-
-export function generatePaginationParams({
-  current,
-  pageSize,
-  createdAt,
-  updatedAt,
-  ...restParams
-}: QueryParams) {
-  let parseCurrent = 1;
-  if (current) {
-    parseCurrent = +current;
-  }
-  let parseSize = 20;
-  if (pageSize) {
-    parseSize = +pageSize;
-  }
-  const orderBy = getOrderBy(createdAt, updatedAt);
-
-  let searchResult: any = {};
-  searchResult = {
-    ...restParams,
-  };
-  if (restParams['name']) {
-    searchResult.name = {
-      contains: restParams['name'],
-    };
-  }
-  return {
-    take: parseSize,
-    skip: parseCurrent - 1,
-    orderBy: {
-      ...orderBy,
-    },
-    where: {
-      ...searchResult,
-    },
-  };
 }
