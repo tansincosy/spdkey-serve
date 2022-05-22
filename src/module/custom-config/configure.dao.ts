@@ -1,16 +1,70 @@
+import { excludePagination, generateQueryParam, likeQuery } from '@/util';
 import { Injectable } from '@nestjs/common';
-import { LoggerService, PageInfoNumber, PrismaService, Logger } from '@/common';
+import {
+  LoggerService,
+  PrismaService,
+  Logger,
+  QueryPagination,
+  Pagination,
+} from '@/common';
 import { isEmpty } from 'lodash';
-import { Config } from './configure.dto';
+import { ConfigDTO, ConfigQueryDTO } from './configure.dto';
+import { Config } from '@prisma/client';
 
 @Injectable()
-export class ConfigureDao {
+export class ConfigureDao implements QueryPagination<ConfigQueryDTO, Config> {
   private logger: Logger;
   constructor(
     private readonly prismaService: PrismaService,
     private readonly log: LoggerService,
   ) {
     this.logger = this.log.getLogger(ConfigureDao.name);
+  }
+
+  async pageList(
+    query: ConfigQueryDTO,
+  ): Promise<Pagination<Partial<Config>[]>> {
+    const queryParams = generateQueryParam(query);
+    const where = {
+      ...likeQuery<Config>(query, 'name'),
+      ...excludePagination(query),
+    };
+    const configList = this.prismaService.config.findMany({
+      ...queryParams,
+      where,
+      select: {
+        id: true,
+        name: true,
+        value: true,
+        updatedAt: true,
+        createdAt: true,
+        introduce: true,
+        ConfigType: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    const deviceCount = this.prismaService.config.count({
+      ...queryParams,
+      where,
+    });
+    const [data, total] = await this.prismaService.$transaction([
+      configList,
+      deviceCount,
+    ]);
+    return {
+      total,
+      data: data.map((item) => {
+        return {
+          ...item,
+          type: item.ConfigType.name,
+        };
+      }),
+      pageSize: query.pageSize,
+      pageNumber: query.current,
+    };
   }
 
   async checkDuplicatedByName(configName: string) {
@@ -23,60 +77,7 @@ export class ConfigureDao {
     return isEmpty(configResult);
   }
 
-  async getConfigByPage(
-    pageSize: string,
-    current: string,
-  ): Promise<Config | Config[] | PageInfoNumber<Config[]>> {
-    this.logger.info(
-      '[getConfigByPage] pageSize >> %s, current>> %s',
-      pageSize,
-      current,
-    );
-    const [data, total] = await this.prismaService.$transaction([
-      this.prismaService.config.findMany({
-        take: +pageSize,
-        skip: +current - 1,
-        orderBy: {
-          createdAt: 'desc',
-        },
-        select: {
-          id: true,
-          name: true,
-          introduce: true,
-          createdAt: true,
-          updatedAt: true,
-          value: true,
-          ConfigType: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      }),
-      this.prismaService.config.count(),
-    ]);
-
-    this.logger.info(' [getConfigByPage] getConfigByPage successfully!!');
-
-    return {
-      total,
-      data: data.map((dataItem) => {
-        return {
-          id: dataItem.id,
-          name: dataItem.name,
-          introduce: dataItem.introduce,
-          createdAt: dataItem.createdAt,
-          updatedAt: dataItem.updatedAt,
-          value: dataItem.value,
-          type: dataItem.ConfigType.name,
-        };
-      }),
-      pageNumber: +current,
-      pageSize: +pageSize,
-    };
-  }
-
-  async updateConfig(config: Config) {
+  async updateConfig(config: ConfigDTO) {
     const result = await this.prismaService.config.update({
       data: {
         name: config.name,
@@ -104,7 +105,7 @@ export class ConfigureDao {
     return result;
   }
 
-  async addConfig(config: Config): Promise<{ id: string }> {
+  async addConfig(config: ConfigDTO): Promise<{ id: string }> {
     const result = await this.prismaService.config.create({
       data: {
         name: config.name,

@@ -1,4 +1,3 @@
-import { QueryParams } from '@/common';
 import {
   Body,
   Controller,
@@ -10,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { Config, DeleteIdPrams } from './configure.dto';
+import { ConfigDTO, ConfigQueryDTO, DeleteIdPrams } from './configure.dto';
 import { ConfigureService } from './configure.service';
 
 @Controller('config')
@@ -18,20 +17,19 @@ export class ConfigureController {
   constructor(private readonly configService: ConfigureService) {}
 
   @Get()
-  // @UseGuards(AuthGuard)
-  getConfig(@Query() query: QueryParams) {
-    return this.configService.get(query);
+  getConfig(@Query() query: ConfigQueryDTO) {
+    return this.configService.pageList(query);
   }
 
   @Post()
   @UseGuards(AuthGuard)
-  addConfig(@Body() config: Config) {
+  addConfig(@Body() config: ConfigDTO) {
     return this.configService.add(config);
   }
 
   @Put()
   @UseGuards(AuthGuard)
-  updateConfig(@Body() config: Config) {
+  updateConfig(@Body() config: ConfigDTO) {
     return this.configService.update(config);
   }
 

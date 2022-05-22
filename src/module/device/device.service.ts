@@ -1,11 +1,11 @@
-import { LoggerService, Logger, Pagination, QueryPagination } from '@/common';
+import { LoggerService, Logger, Pagination } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { DeviceDao } from './device.dao';
 import { DeviceDTO, DeviceParams } from './device.dto';
 
 @Injectable()
-export class DeviceService implements QueryPagination<DeviceParams, Device> {
+export class DeviceService {
   private logger: Logger;
   constructor(
     private readonly loggerService: LoggerService,

@@ -1,12 +1,15 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { Logger } from 'log4js';
+import { LoggerService } from './log4j.service';
 
 @Injectable()
 export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor() {
+  private log: Logger;
+  constructor(private readonly logger: LoggerService) {
     super({
       log:
         process.env.log_level === 'debug'
