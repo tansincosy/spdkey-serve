@@ -220,3 +220,14 @@ model EPGSourceChannel {
   ePGUrlId String? @map("epg_url_id")
   @@map("zap_tb_program_channel")
 }
+
+model OperationLog {
+  id      String @id @default(cuid())
+  level   String @default("info")
+  message String @db.Text
+  context String @db.Text
+  user    String @default("")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("zap_tb_operation_log")
+}

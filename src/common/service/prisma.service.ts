@@ -11,10 +11,16 @@ export class PrismaService
   private log: Logger;
   constructor(private readonly logger: LoggerService) {
     super({
-      log:
-        process.env.log_level === 'debug'
-          ? ['query', 'info', 'warn', 'error']
-          : ['error'],
+      log: [
+        {
+          emit: 'event',
+          level: 'query',
+        },
+        'query',
+        'info',
+        'warn',
+        'error',
+      ],
     });
     this.$use(async (params, next) => {
       const { action, args } = params;

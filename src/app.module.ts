@@ -14,7 +14,7 @@ import {
   ChannelModule,
   ConfigureModule,
   DeviceModule,
-  LoggerModule,
+  OperationLogModule,
   ProgramModule,
   UserModule,
 } from '@/module';
@@ -43,7 +43,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     ConfigureModule,
     ChannelModule,
     ProgramModule,
-    LoggerModule,
+    OperationLogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

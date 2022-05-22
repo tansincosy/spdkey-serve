@@ -5,7 +5,7 @@ export const logConfig: Configuration = {
   appenders: {
     logstash: {
       type: '@log4js-node/logstash-http',
-      url: 'http://localhost:3000/logger',
+      url: 'http://localhost:3000/operation-log',
       application: 'logstash-log4js',
       logType: 'application',
       logChannel: 'node',

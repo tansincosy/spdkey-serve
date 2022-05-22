@@ -4,6 +4,7 @@ import { LoggerService, Pagination, QueryPagination } from '@/common';
 import { ConfigureDao } from './configure.dao';
 import { ConfigDTO, ConfigQueryDTO } from './configure.dto';
 import { Config, ConfigType } from '@prisma/client';
+import { OperationLogService } from '../operation-log/operation-log.service';
 
 @Injectable()
 export class ConfigureService
@@ -12,6 +13,7 @@ export class ConfigureService
   private logger: Logger;
   constructor(
     private log: LoggerService,
+    private actionLog: OperationLogService,
     private readonly configDao: ConfigureDao,
   ) {
     this.logger = this.log.getLogger(ConfigureService.name);
@@ -31,7 +33,13 @@ export class ConfigureService
   }
 
   async update(t: ConfigDTO): Promise<{ id: string }> {
-    return this.configDao.updateConfig(t);
+    const result = await this.configDao.updateConfig(t);
+    this.actionLog.info(
+      'user',
+      ConfigureService.name,
+      'update custom config success',
+    );
+    return result;
   }
   async add(t: ConfigDTO): Promise<{ id: string }> {
     return this.configDao.addConfig(t);
