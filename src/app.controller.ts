@@ -10,24 +10,7 @@ export class AppController {
   ) {}
 
   @Get()
-  getHello(): string {
+  getHello() {
     return this.appService.getHello();
-  }
-
-  @Get('download')
-  async downloadFile() {
-    console.time();
-    await this.downloadService
-      .downloadFile(
-        'https://iptv-org.github.io/iptv/index.m3u',
-        'tmp',
-        'YYYYMMDD',
-      )
-      .on('end', (d) => console.log('Download Completed1111', d))
-      .start();
-
-    console.timeEnd();
-    console.log('edn');
-    return {};
   }
 }

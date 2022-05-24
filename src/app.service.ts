@@ -7,7 +7,10 @@ export class AppService {
   constructor(private readonly loggerService: LoggerService) {
     this.logger = loggerService.getLogger(AppService.name);
   }
-  getHello(): string {
-    return 'Hello World!';
+  getHello() {
+    return {
+      app: '',
+      version: '',
+    };
   }
 }

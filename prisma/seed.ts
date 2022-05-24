@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+
 async function main() {
   const user = await prisma.user.findFirst({
     where: {
@@ -11,7 +12,8 @@ async function main() {
     await prisma.user.create({
       data: {
         username: 'admin',
-        password: '93e0081fba7d633c53b1e4cf49b360f7',
+        password:
+          'ade07a952dc602a3514ebeb83ec8aa36:adfa025aaa1e4b1ded169dda56a9df95',
         scopes: {
           create: {
             scope: {

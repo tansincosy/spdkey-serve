@@ -38,7 +38,6 @@ export class AllExceptionFilter implements ExceptionFilter {
   constructor(private readonly Log4js: LoggerService) {
     this.logger = this.Log4js.getLogger(AllExceptionFilter.name);
   }
-
   catch(exception: HttpException | OAuthError | any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

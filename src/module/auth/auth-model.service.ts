@@ -133,7 +133,7 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     scope: string | string[],
   ): Promise<string> {
     const refreshKey = this.configService.get(
-      'crypto.refreshToken',
+      'crypto.token.refresh',
     ) as unknown as string;
     return sign(
       {
@@ -204,10 +204,10 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
   ): Promise<string> {
     this.logger.debug(
       'jwt.key.token.access',
-      this.configService.get('crypto.accessToken'),
+      this.configService.get('crypto.token.access'),
     );
     const accessKey = this.configService.get(
-      'crypto.accessToken',
+      'crypto.token.access',
     ) as unknown as string;
 
     return sign(
