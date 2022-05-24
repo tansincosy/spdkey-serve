@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import * as OAuth2 from 'oauth2-server';
-import { BaseException, LoggerService, Logger } from '@/common';
+import { BaseException, LoggerService, Logger, Encrypted } from '@/common';
 import { AuthModelService } from './auth-model.service';
 import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';
 import { CryptoConfig } from '@/config';
@@ -132,8 +132,8 @@ export class AuthService {
       throw new BaseException(BasicExceptionCode.UPDATE_PASSWORD_FAILED);
     }
 
-    const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
-    const encryptPassword = encrypt(cryptoConfig.encryptedKey, password);
+    const cryptoConfig = this.configService.get<Encrypted>('crypto');
+    const encryptPassword = encrypt(cryptoConfig.app.key, password);
 
     const { id } = await this.userDao.updateUserPassword(
       username,

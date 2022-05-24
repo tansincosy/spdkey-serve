@@ -1,4 +1,4 @@
-import { BaseException, Logger, LoggerService } from '@/common';
+import { BaseException, Encrypted, Logger, LoggerService } from '@/common';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
@@ -16,7 +16,6 @@ import { isEmpty } from 'lodash';
 import { sign } from 'jsonwebtoken';
 import { format } from 'util';
 import { decrypt, secretMask, atob } from '@/util';
-import { CryptoConfig } from '@/config';
 import { Request } from 'express';
 import { DeviceDao } from '../device/device.dao';
 import { UserDao } from '../user/user.dao';
@@ -153,12 +152,12 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       this.logger.warn('find user is empty');
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }
-    const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
+    const cryptoConfig = this.configService.get<Encrypted>('crypto');
     this.logger.debug(
       '[getUser] cryptoConfig encryptedKey = ',
-      secretMask(cryptoConfig.encryptedKey),
+      secretMask(cryptoConfig.app.key),
     );
-    const decryptPassword = decrypt(cryptoConfig.encryptedKey, user.password);
+    const decryptPassword = decrypt(cryptoConfig.app.key, user.password);
     this.logger.debug('[getUser] dePass = %s', secretMask(decryptPassword));
     if (password !== decryptPassword) {
       this.logger.warn("[getUser] user's password is wrong");

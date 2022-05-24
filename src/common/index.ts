@@ -10,3 +10,4 @@ export * from './common.module';
 export * from './interface/page-info.interface';
 export * from './dto/query.dto';
 export * from './service/download.service';
+export * from './interface/app-config.interface';

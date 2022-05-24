@@ -1,0 +1,34 @@
+app:
+  name: app
+  version: 0.0.1
+  port: 3000
+  data: app_data
+log:
+  level: debug
+  path: logs
+cache:
+  redis:
+    host: 127.0.0.1
+    port: 3306
+database:
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    name: zap
+    user: root
+    password: 123456
+encrypted:
+  app:
+    key: 2A9ul1is8Fiu2BC4D20p7Bxgkqo9n4cj
+    iv: v8bE3xv5owoA116yB4E0svn88Bn4xm3g
+  token: 
+    access: 7jWGaGgMxAKy6IaphwHopuPMqSq3EXSz
+    refresh: zlIgZjw8NlHOjD6O6ekYZ793mJxBpz3B
+    passKey: EMH#!Xj7aPaEyE4RVg4aOsUB^r%H0R4DVT89hzE4*kSU@FdU&6myuP8AorQ7dmVs7IJslDljtv@#e#J%g0yQ5F9a%&X%iPkr%9%
+mail:
+  host: smtp.gmail.com
+  port: 456
+  user: stupidonkey@foxmail.com
+  pass: 
+  redirect:
+  secure: false

@@ -6,6 +6,7 @@ import {
   PrismaService,
   Pagination,
   QueryPagination,
+  Encrypted,
 } from '@/common';
 import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
@@ -61,11 +62,11 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
   async userRegister(userParams: RegisterParam) {
     const { password } = userParams;
 
-    const cryptoConfig = this.configService.get<CryptoConfig>('crypto');
+    const cryptoConfig = this.configService.get<Encrypted>('crypto');
     const nodeMailerConfig =
       this.configService.get<SMTPTransport.Options>('eMail');
     this.log.debug('cryptoConfig = ', cryptoConfig);
-    const encryptPassword = encrypt(cryptoConfig.encryptedKey, password);
+    const encryptPassword = encrypt(cryptoConfig.app.key, password);
     userParams.password = encryptPassword;
     this.log.info('[userRegister] encrypt Password successFully !!');
     const emailCode = await encryptedWithPbkdf2(userParams.email).catch(() => {

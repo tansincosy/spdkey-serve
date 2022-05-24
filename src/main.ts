@@ -1,10 +1,12 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { readFileSync } from 'fs';
 import { AppModule } from './app.module';
 import { AllExceptionFilter, LoggerService } from './common';
 import { logConfig } from './config/log4js.config';
 import { Log } from './util';
+import Config from './config/yaml.config';
+
+const appConfig = Config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new Log(logConfig),
@@ -17,10 +19,14 @@ async function bootstrap() {
       forbidUnknownValues: true,
     }),
   );
-  await app.listen(process.env.app_port || 3000);
-  const banner = readFileSync('banner.txt');
+  await app.listen(appConfig.app.port || 3000);
   console.log(`
-${banner}
+  ██╗███╗   ██╗   ██╗  ██╗ █████╗ ███╗   ██╗████████╗██╗   ██╗
+  ██║████╗  ██║   ██║ ██╔╝██╔══██╗████╗  ██║╚══██╔══╝██║   ██║
+  ██║██╔██╗ ██║   █████╔╝ ███████║██╔██╗ ██║   ██║   ██║   ██║
+  ██║██║╚██╗██║   ██╔═██╗ ██╔══██║██║╚██╗██║   ██║   ╚██╗ ██╔╝
+  ██║██║ ╚████║██╗██║  ██╗██║  ██║██║ ╚████║   ██║    ╚████╔╝ 
+  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝     ╚═══╝ 
 THE SERVER STARTED ON ${await app.getUrl()}
   `);
 }

@@ -1,6 +1,10 @@
 import { CONFIG_KEY } from '@/constant';
 import { registerAs } from '@nestjs/config';
+import appConfig from './yaml.config';
 
+const config = appConfig();
+
+const appDataPath = config?.app.data || '';
 export interface CommonConfig {
   m3uPath: string;
   programXMLPath: string;
@@ -8,9 +12,12 @@ export interface CommonConfig {
   logoPath: string;
 }
 
-export const CommonConfig = registerAs(CONFIG_KEY.APP_CONFIG, () => ({
-  m3uPath: 'app_data/channel/m3u',
-  logoPath: 'app_data/channel/channel_logo',
-  programXMLPath: 'app_data/channel/program',
-  allowChannelPath: 'app_data/channel/all_channel',
-}));
+export const CommonConfig = registerAs<CommonConfig>(
+  CONFIG_KEY.APP_CONFIG,
+  () => ({
+    m3uPath: `${appDataPath}/channel/m3u`,
+    logoPath: `${appDataPath}/channel/channel_logo`,
+    programXMLPath: `${appDataPath}/channel/program`,
+    allowChannelPath: `${appDataPath}/channel/all_channel`,
+  }),
+);
