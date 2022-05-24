@@ -5,7 +5,6 @@ import {
   LoggerService,
   PrismaService,
 } from '@/common';
-import { CommonConfig } from '@/config';
 import {
   BasicExceptionCode,
   ChannelConstant,
@@ -26,6 +25,7 @@ import { join } from 'path';
 import { promisify } from 'util';
 import { EpgChannel, EpgUrl, M3U, M3uChannel } from './channel.type';
 import { exec } from 'child_process';
+import { CommonConfig } from '@/config/common.config';
 
 const readFilePromise = promisify(readFile);
 const execPromise = promisify(exec);

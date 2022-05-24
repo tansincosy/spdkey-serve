@@ -4,7 +4,6 @@ import * as OAuth2 from 'oauth2-server';
 import { BaseException, LoggerService, Logger, Encrypted } from '@/common';
 import { AuthModelService } from './auth-model.service';
 import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';
-import { CryptoConfig } from '@/config';
 import { UserDao } from '../user/user.dao';
 import { BasicExceptionCode, HAS_VALID, UserExceptionCode } from '@/constant';
 import { CheckCode, ModifyParam } from '../user/user.dto';

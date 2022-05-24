@@ -3,20 +3,20 @@ const prisma = new PrismaClient();
 async function main() {
   const user = await prisma.user.findFirst({
     where: {
-      username: 'charlesmaxwellyoung@gmail.com',
+      username: 'admin',
     },
   });
 
   if (!user) {
     await prisma.user.create({
       data: {
-        username: 'charlesmaxwellyoung@gmail.com',
+        username: 'admin',
         password: '93e0081fba7d633c53b1e4cf49b360f7',
         scopes: {
           create: {
             scope: {
               create: {
-                name: 'sys',
+                name: 'portal',
               },
             },
           },

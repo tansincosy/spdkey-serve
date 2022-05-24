@@ -22,7 +22,6 @@ import {
   likeQuery,
   excludePagination,
 } from '@/util';
-import { CryptoConfig } from '@/config';
 import { Request, Response } from 'express';
 import { Cache } from 'cache-manager';
 import { Token } from 'oauth2-server';
