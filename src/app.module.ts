@@ -1,4 +1,4 @@
-import { CacheModule, MiddlewareConsumer, Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as store from 'cache-manager-redis-store';
@@ -13,10 +13,10 @@ import { ProgramModule } from '@/module/program/program.module';
 import { OperationLogModule } from '@/module/operation-log/operation-log.module';
 import { DataBaseModule } from '@/processor/database/database.module';
 import { LoggerModule } from './processor/log4j/log4j.module';
-import { HttpRequestMiddleware } from './middleware/http-request.middleware';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { HttpSpendTimeInterceptor } from './interceptor/http-time.interceptor';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigureModule } from './module/custom-config/configure.module';
+import { LoggingInterceptor } from './interceptor/logger.interceptor';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 const cacheRedisStore = () => {
   if (process.env.CACHE_STORE_HOST && process.env.CACHE_STORE_PORT) {
@@ -39,6 +39,11 @@ const cacheRedisStore = () => {
     DeviceModule,
     AuthModule,
     DataBaseModule,
+    ThrottlerModule.forRoot({
+      ttl: 60 * 5, // 5 minutes
+      limit: 300, // 300 limit
+      ignoreUserAgents: [/googlebot/gi, /bingbot/gi, /baidubot/gi],
+    }),
     ConfigModule.forRoot({
       load: [AppConfigLoader, LoggerConfigLoader],
       isGlobal: true,
@@ -52,11 +57,14 @@ const cacheRedisStore = () => {
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_INTERCEPTOR, useClass: HttpSpendTimeInterceptor },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(HttpRequestMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

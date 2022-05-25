@@ -6,6 +6,7 @@ export const AppConfigLoader = () => ({
   version: process.env.APP_VERSION || '0.0.0',
   author: 'yy921010',
   dataDir,
+  env: process.env.APP_ENV || 'dev',
   log: {
     level: process.env.LOG_LEVEL || 'info',
     dir: `${dataDir}/logs`,
