@@ -1,9 +1,8 @@
 import { CacheModule, MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
 import * as store from 'cache-manager-redis-store';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AppConfigLoader } from '@/processor/config/app.config';
 import { LoggerConfigLoader } from '@/processor/config/log4js.config';
 import { UserModule } from '@/module/user/user.module';
@@ -17,7 +16,21 @@ import { LoggerModule } from './processor/log4j/log4j.module';
 import { HttpRequestMiddleware } from './middleware/http-request.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpSpendTimeInterceptor } from './interceptor/http-time.interceptor';
-import { LoggerService } from './processor/log4j/log4j.service';
+import { ConfigureModule } from './module/custom-config/configure.module';
+
+const cacheRedisStore = () => {
+  if (process.env.CACHE_STORE_HOST && process.env.CACHE_STORE_PORT) {
+    return {
+      store: store,
+      host: process.env.CACHE_STORE_HOST,
+      port: parseInt(process.env.CACHE_STORE_PORT, 10),
+      isGlobal: true,
+    };
+  }
+  return {
+    isGlobal: true,
+  };
+};
 @Module({
   imports: [
     DataBaseModule,
@@ -30,28 +43,11 @@ import { LoggerService } from './processor/log4j/log4j.service';
       load: [AppConfigLoader, LoggerConfigLoader],
       isGlobal: true,
     }),
-    CacheModule.register({
-      isGlobal: true,
-    }),
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService, LoggerService],
-      useFactory: async (config: ConfigService, log: LoggerService) => {
-        const cacheConfig = config.get('cache');
-        if (cacheConfig.host) {
-          log.getLogger(CacheModule.name).info('user redis store');
-          return {
-            store,
-            ...cacheConfig,
-          };
-        }
-        log.getLogger(CacheModule.name).info('user local store');
-        return {};
-      },
-    }),
+    CacheModule.register(cacheRedisStore()),
     ChannelModule,
     ProgramModule,
     OperationLogModule,
+    ConfigureModule,
   ],
   controllers: [AppController],
   providers: [
