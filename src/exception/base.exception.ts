@@ -1,8 +1,8 @@
 import {
   BasicExceptionCode,
-  TMDBErrorCode,
   UserExceptionCode,
-} from '@/constant';
+} from '@/constant/error-code.constant';
+import { TMDBErrorCode } from '@/constant/tmdb.constant';
 import { HttpException } from '@nestjs/common';
 
 import { BasicException } from './message.exception';

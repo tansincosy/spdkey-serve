@@ -1,11 +1,7 @@
+import { Pagination, QueryPagination } from '@/interface/page-info.interface';
+import { PrismaService } from '@/processor/database/prisma.service';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { excludePagination, generateQueryParam, likeQuery } from '@/util';
-import {
-  Logger,
-  LoggerService,
-  Pagination,
-  PrismaService,
-  QueryPagination,
-} from '@/common';
 import { Injectable } from '@nestjs/common';
 import { Program } from '@prisma/client';
 import { ProgramDTO } from './program.dto';

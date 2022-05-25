@@ -1,4 +1,5 @@
-import { Logger, LoggerService, PrismaService } from '@/common';
+import { PrismaService } from '@/processor/database/prisma.service';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { getOrderBy } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { M3uChannel, EpgUrl, EpgChannel } from './channel.type';

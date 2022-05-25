@@ -1,4 +1,5 @@
-import { LoggerService, Logger, Pagination } from '@/common';
+import { Pagination } from '@/interface/page-info.interface';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { Injectable } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { DeviceDao } from './device.dao';

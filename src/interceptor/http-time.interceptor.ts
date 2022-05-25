@@ -1,3 +1,4 @@
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import {
   CallHandler,
   ExecutionContext,
@@ -6,8 +7,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Logger } from 'log4js';
-import { LoggerService } from '../service/log4j.service';
 
 @Injectable()
 export class HttpSpendTimeInterceptor implements NestInterceptor {

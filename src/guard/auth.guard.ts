@@ -1,6 +1,6 @@
+import { AuthService } from '@/module/auth/auth.service';
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import * as OAuth2 from 'oauth2-server';
-import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

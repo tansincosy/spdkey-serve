@@ -1,4 +1,4 @@
-import { QueryParams } from '@/common';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 import {
   createCipheriv,
   createDecipheriv,
@@ -233,7 +233,7 @@ export const getContentByRegex = (
   return '';
 };
 
-export function generateQueryParam(params: QueryParams) {
+export function generateQueryParam(params: PaginateBaseDTO) {
   const { current, pageSize, createdAt, updatedAt } = params;
   if (!current || !pageSize) {
     return {};
@@ -252,7 +252,7 @@ export function generateQueryParam(params: QueryParams) {
   return query;
 }
 
-export function excludePagination(param: QueryParams) {
+export function excludePagination(param: PaginateBaseDTO) {
   const newParam = cloneDeep(param);
   if (newParam.pageSize) delete newParam.pageSize;
   if (newParam.current) delete newParam.current;

@@ -1,4 +1,4 @@
-import { DeleteIdPrams } from '@/common';
+import { BatchDelDTO } from '@/model/delete.model';
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import {
   ChannelQueryDTO,
@@ -25,7 +25,7 @@ export class ChannelController {
   }
 
   @Delete('/source')
-  deleteM3uUrl(@Body() idObj: DeleteIdPrams) {
+  deleteM3uUrl(@Body() idObj: BatchDelDTO) {
     return this.channelService.batchDelete(idObj);
   }
 

@@ -1,5 +1,5 @@
-import { QueryParams } from '@/common';
-import { IsArray, IsDefined, IsString } from 'class-validator';
+import { PaginateBaseDTO } from '@/model/paginate.model';
+import { IsDefined, IsString } from 'class-validator';
 
 export class ConfigDTO {
   @IsString()
@@ -19,9 +19,4 @@ export class ConfigDTO {
   updatedAt?: Date;
 }
 
-export class ConfigQueryDTO extends QueryParams {}
-
-export class DeleteIdPrams {
-  @IsArray()
-  ids: string[];
-}
+export class ConfigQueryDTO extends PaginateBaseDTO {}

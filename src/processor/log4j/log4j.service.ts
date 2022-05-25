@@ -9,3 +9,6 @@ export class LoggerService extends Log {
     super(configService.get<Configuration>('logger'));
   }
 }
+
+// 作为参数导出
+export { Logger } from 'log4js';

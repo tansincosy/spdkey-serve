@@ -1,6 +1,6 @@
-import { QueryParams } from '@/common';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 
-export class ProgramDTO extends QueryParams {
+export class ProgramDTO extends PaginateBaseDTO {
   name: string;
   introduce?: string;
   startTime: string;

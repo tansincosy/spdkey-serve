@@ -1,4 +1,4 @@
-import { API } from '@/constant';
+import { API } from '@/constant/api.constant';
 import { Controller, Get, Query } from '@nestjs/common';
 import { ProgramDTO } from './program.dto';
 import { ProgramService } from './program.service';

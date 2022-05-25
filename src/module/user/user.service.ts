@@ -1,13 +1,4 @@
 import { isEmpty } from 'lodash';
-import {
-  BaseException,
-  LoggerService,
-  Logger,
-  PrismaService,
-  Pagination,
-  QueryPagination,
-  Encrypted,
-} from '@/common';
 import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
@@ -28,12 +19,18 @@ import { Token } from 'oauth2-server';
 import { format } from 'util';
 import { UserDao } from './user.dao';
 import { RegisterParam, UserQueryParam } from './user.dto';
+
+import { User } from '@prisma/client';
+import { Pagination, QueryPagination } from '@/interface/page-info.interface';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
+import { PrismaService } from '@/processor/database/prisma.service';
+import { BaseException } from '@/exception/base.exception';
 import {
   BasicExceptionCode,
-  TOKEN_FORMAT,
   UserExceptionCode,
-} from '@/constant';
-import { User } from '@prisma/client';
+} from '@/constant/error-code.constant';
+import { Encrypted } from '@/interface/app-config.interface';
+import { TOKEN_FORMAT } from '@/constant/user.constant';
 
 @Injectable()
 export class UserService implements QueryPagination<UserQueryParam, User> {
@@ -61,11 +58,11 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
   async userRegister(userParams: RegisterParam) {
     const { password } = userParams;
 
-    const cryptoConfig = this.configService.get<Encrypted>('crypto');
+    const cryptoConfig = this.configService.get<Encrypted>('encrypted');
     const nodeMailerConfig =
-      this.configService.get<SMTPTransport.Options>('eMail');
+      this.configService.get<SMTPTransport.Options>('mail');
     this.log.debug('cryptoConfig = ', cryptoConfig);
-    const encryptPassword = encrypt(cryptoConfig.app.key, password);
+    const encryptPassword = encrypt(cryptoConfig.key, password);
     userParams.password = encryptPassword;
     this.log.info('[userRegister] encrypt Password successFully !!');
     const emailCode = await encryptedWithPbkdf2(userParams.email).catch(() => {
@@ -110,7 +107,7 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
       userEmail,
     );
     const nodeMailerConfig =
-      this.configService.get<SMTPTransport.Options>('eMail');
+      this.configService.get<SMTPTransport.Options>('mail');
     this.log.debug('nodeMailerConfig', nodeMailerConfig);
     if (!nodeMailerConfig.host) {
       this.log.warn(

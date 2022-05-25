@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'log4js';
-import { LoggerService } from './common';
+import { LoggerService } from './processor/log4j/log4j.service';
 @Injectable()
 export class AppService {
   private logger: Logger;

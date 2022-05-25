@@ -1,4 +1,4 @@
-import { QueryParams } from '@/common';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 import {
   IsEmail,
   IsNotEmpty,
@@ -63,6 +63,6 @@ export class ModifyParam {
   authCode: string;
 }
 
-export class UserQueryParam extends QueryParams {
+export class UserQueryParam extends PaginateBaseDTO {
   username?: string;
 }

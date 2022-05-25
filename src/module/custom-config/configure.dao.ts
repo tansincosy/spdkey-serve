@@ -1,15 +1,11 @@
 import { excludePagination, generateQueryParam, likeQuery } from '@/util';
 import { Injectable } from '@nestjs/common';
-import {
-  LoggerService,
-  PrismaService,
-  Logger,
-  QueryPagination,
-  Pagination,
-} from '@/common';
 import { isEmpty } from 'lodash';
 import { ConfigDTO, ConfigQueryDTO } from './configure.dto';
 import { Config } from '@prisma/client';
+import { Pagination, QueryPagination } from '@/interface/page-info.interface';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
+import { PrismaService } from '@/processor/database/prisma.service';
 
 @Injectable()
 export class ConfigureDao implements QueryPagination<ConfigQueryDTO, Config> {

@@ -1,4 +1,4 @@
-import { QueryParams } from '@/common';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 import { IsBoolean, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class ParseUrlDTO {
@@ -11,7 +11,7 @@ export class ParseUrlDTO {
   isForceUpdate?: boolean;
 }
 
-export class QueryChannelSourceDTO extends QueryParams {
+export class QueryChannelSourceDTO extends PaginateBaseDTO {
   @IsString()
   status?: string;
   @IsString()
@@ -20,12 +20,12 @@ export class QueryChannelSourceDTO extends QueryParams {
   language?: string;
 }
 
-export class QueryChannelDTO extends QueryParams {
+export class QueryChannelDTO extends PaginateBaseDTO {
   @IsBoolean({})
   isForceUpdate?: boolean;
 }
 
-export class ChannelQueryDTO extends QueryParams {
+export class ChannelQueryDTO extends PaginateBaseDTO {
   @IsString()
   name: string;
 }

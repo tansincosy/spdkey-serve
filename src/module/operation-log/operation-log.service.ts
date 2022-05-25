@@ -1,4 +1,5 @@
-import { DeleteIdPrams, QueryParams } from '@/common';
+import { BatchDelDTO } from '@/model/delete.model';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 import { Injectable } from '@nestjs/common';
 import { OperationLogDAO } from './operation-log.dao';
 import { OperationLogDTO } from './operation-log.type';
@@ -7,10 +8,10 @@ import { OperationLogDTO } from './operation-log.type';
 export class OperationLogService {
   constructor(private readonly operationLogDAO: OperationLogDAO) {}
 
-  getLogList(query: QueryParams) {
+  getLogList(query: PaginateBaseDTO) {
     return this.operationLogDAO.pageList(query);
   }
-  deleteLogger({ ids }: DeleteIdPrams) {
+  deleteLogger({ ids }: BatchDelDTO) {
     return this.operationLogDAO.delLog(ids);
   }
 

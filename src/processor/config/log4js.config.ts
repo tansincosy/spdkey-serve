@@ -1,13 +1,10 @@
 import { registerAs } from '@nestjs/config';
 import { Configuration } from 'log4js';
-import Config from './yaml.config';
-const appConfig = Config();
-const appDefaultData = appConfig?.app?.data || 'app_data';
-const logDefault = appConfig?.log?.path || 'logs';
-const logLevel = appConfig?.log?.level || 'info';
+import { AppConfigLoader } from './app.config';
 
-const logPath = `${appDefaultData}/${logDefault}`;
+const config = AppConfigLoader();
 
+console.log('config>>>>>', config.log.level);
 export const logConfig: Configuration = {
   appenders: {
     console: {
@@ -19,7 +16,7 @@ export const logConfig: Configuration = {
     },
     access: {
       type: 'dateFile',
-      filename: `${logPath}/interface/i_APP.log`,
+      filename: `${config.log.dir}/interface/i_APP.log`,
       pattern: 'yyyy-MM-dd',
       category: 'http',
       layout: {
@@ -29,7 +26,7 @@ export const logConfig: Configuration = {
     },
     download: {
       type: 'dateFile',
-      filename: `${logPath}/download/d_APP.log`,
+      filename: `${config.log.dir}/download/d_APP.log`,
       pattern: 'yyyy-MM-dd',
       category: 'download',
       layout: {
@@ -39,7 +36,7 @@ export const logConfig: Configuration = {
     },
     appLog: {
       type: 'dateFile',
-      filename: `${logPath}/app/c_APP.log`,
+      filename: `${config.log.dir}/app/c_APP.log`,
       pattern: 'yyyy-MM-dd',
       keepFileExt: true,
       compress: true,
@@ -55,7 +52,7 @@ export const logConfig: Configuration = {
     },
     errorFile: {
       type: 'dateFile',
-      filename: `${logPath}/error/e_APP.log`,
+      filename: `${config.log.dir}/error/e_APP.log`,
       alwaysIncludePattern: true,
       pattern: 'yyyy-MM-dd',
       keepFileExt: true,
@@ -74,13 +71,13 @@ export const logConfig: Configuration = {
   categories: {
     default: {
       appenders: ['console', 'appLogFilter', 'errors'],
-      level: logLevel,
+      level: config.log.level,
     },
-    http: { appenders: ['access'], level: logLevel },
-    download: { appenders: ['download'], level: logLevel },
+    http: { appenders: ['access'], level: config.log.level },
+    download: { appenders: ['download'], level: config.log.level },
   },
 };
-export const LoggerConfig = registerAs<Configuration>(
+export const LoggerConfigLoader = registerAs<Configuration>(
   'logger',
   () => logConfig,
 );

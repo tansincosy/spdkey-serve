@@ -1,4 +1,4 @@
-import { QueryParams } from '@/common';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 import { IsNumber, IsString } from 'class-validator';
 
 export class DeviceDTO {
@@ -25,7 +25,7 @@ export class DeviceDTO {
   id?: string;
 }
 
-export class DeviceParams extends QueryParams {
+export class DeviceParams extends PaginateBaseDTO {
   @IsString()
   readonly name: string;
   @IsNumber()

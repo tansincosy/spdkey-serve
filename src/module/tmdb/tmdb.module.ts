@@ -1,4 +1,4 @@
-import { Logger, LoggerService } from '@/common';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { Global, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

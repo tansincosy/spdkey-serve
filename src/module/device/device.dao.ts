@@ -1,11 +1,7 @@
-import {
-  LoggerService,
-  PrismaService,
-  Logger,
-  Pagination,
-  QueryPagination,
-} from '@/common';
-import { DeviceLineStatus, DeviceLock } from '@/constant';
+import { DeviceLineStatus, DeviceLock } from '@/constant/device.constant';
+import { Pagination, QueryPagination } from '@/interface/page-info.interface';
+import { PrismaService } from '@/processor/database/prisma.service';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import {
   encryptedWithPbkdf2,
   excludePagination,

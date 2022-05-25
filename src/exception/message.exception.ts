@@ -1,8 +1,8 @@
 import {
   BasicExceptionCode,
-  TMDBErrorCode,
   UserExceptionCode,
-} from '@/constant';
+} from '@/constant/error-code.constant';
+import { TMDBErrorCode } from '@/constant/tmdb.constant';
 
 export const BasicException = new Map<
   BasicExceptionCode | UserExceptionCode | TMDBErrorCode,

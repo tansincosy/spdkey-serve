@@ -1,4 +1,4 @@
-import { QueryParams } from '@/common';
+import { PaginateBaseDTO } from '@/model/paginate.model';
 import { IsString } from 'class-validator';
 
 export class OperationLogDTO {
@@ -9,7 +9,7 @@ export class OperationLogDTO {
   user?: string;
 }
 
-export class QueryLogPrams extends QueryParams {
+export class QueryLogPrams extends PaginateBaseDTO {
   @IsString()
   context?: string;
 }

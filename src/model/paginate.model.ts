@@ -1,15 +1,22 @@
 import { unknownToNumber } from '@/transform/value.transform';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class PaginateBaseDTO {
-  @IsString()
+  @IsNumber()
   @Min(1)
   @Transform(({ value }) => unknownToNumber(value))
   @IsOptional()
   @IsNotEmpty()
   current?: number;
-  @IsString()
+  @IsNumber()
   @Max(50)
   @Transform(({ value }) => unknownToNumber(value))
   @IsOptional()
@@ -19,4 +26,7 @@ export class PaginateBaseDTO {
   createdAt?: string;
   @IsString()
   updatedAt?: string;
+  @IsString()
+  @IsOptional()
+  id?: string;
 }

@@ -41,16 +41,12 @@ export interface Database {
 export interface Token {
   access: string;
   refresh: string;
-  passKey: string;
+  secure: string;
 }
 
-interface EncryptedApp {
+export interface Encrypted {
   key: string;
   iv: string;
-}
-export interface Encrypted {
-  token?: Token;
-  app?: EncryptedApp;
 }
 
 export interface Mail {

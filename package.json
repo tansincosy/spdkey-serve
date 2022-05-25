@@ -28,9 +28,8 @@
   "dependencies": {
     "@nestjs/axios": "^0.0.7",
     "@nestjs/common": "^8.4.4",
-    "@nestjs/config": "^1.2.0",
+    "@nestjs/config": "^2.0.1",
     "@nestjs/core": "^8.4.3",
-    "@nestjs/event-emitter": "^1.1.1",
     "@nestjs/platform-express": "^8.4.3",
     "@prisma/client": "^3.10.0",
     "cache-manager": "^3.6.0",

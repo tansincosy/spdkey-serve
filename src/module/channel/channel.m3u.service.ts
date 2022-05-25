@@ -1,16 +1,3 @@
-import {
-  BaseException,
-  DownloadService,
-  Logger,
-  LoggerService,
-  PrismaService,
-} from '@/common';
-import {
-  BasicExceptionCode,
-  ChannelConstant,
-  ChannelReg,
-  CONFIG_KEY,
-} from '@/constant';
 import { getContentByRegex, moreThOne } from '@/util';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -25,7 +12,12 @@ import { join } from 'path';
 import { promisify } from 'util';
 import { EpgChannel, EpgUrl, M3U, M3uChannel } from './channel.type';
 import { exec } from 'child_process';
-import { CommonConfig } from '@/config/common.config';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
+import { PrismaService } from '@/processor/database/prisma.service';
+import { DownloadService } from '@/processor/download/download.service';
+import { BasicExceptionCode } from '@/constant/error-code.constant';
+import { BaseException } from '@/exception/base.exception';
+import { ChannelConstant, ChannelReg } from '@/constant/channel.constant';
 
 const readFilePromise = promisify(readFile);
 const execPromise = promisify(exec);
@@ -33,7 +25,7 @@ const execPromise = promisify(exec);
 @Injectable()
 export class M3UService {
   private logger: Logger;
-  private appConfig: CommonConfig;
+  private appConfig: any;
 
   private downloadEPGXMLPercent = 0;
   constructor(
@@ -43,9 +35,7 @@ export class M3UService {
     private readonly downloaderService: DownloadService,
   ) {
     this.logger = this.loggerService.getLogger(M3UService.name);
-    this.appConfig = this.configService.get<CommonConfig>(
-      CONFIG_KEY.APP_CONFIG,
-    );
+    this.appConfig = this.configService.get('channel');
   }
 
   /**

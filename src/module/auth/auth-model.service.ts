@@ -1,4 +1,3 @@
-import { BaseException, Encrypted, Logger, LoggerService } from '@/common';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
@@ -19,7 +18,11 @@ import { decrypt, secretMask, atob } from '@/util';
 import { Request } from 'express';
 import { DeviceDao } from '../device/device.dao';
 import { UserDao } from '../user/user.dao';
-import { BasicExceptionCode, UserLocked } from '@/constant';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
+import { BasicExceptionCode } from '@/constant/error-code.constant';
+import { BaseException } from '@/exception/base.exception';
+import { Encrypted } from '@/interface/app-config.interface';
+import { UserLocked } from '@/constant/user.constant';
 
 enum DeviceStatus {
   LOCKED = 1,
@@ -133,7 +136,7 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
     scope: string | string[],
   ): Promise<string> {
     const refreshKey = this.configService.get(
-      'crypto.token.refresh',
+      'token.refresh',
     ) as unknown as string;
     return sign(
       {
@@ -152,12 +155,12 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
       this.logger.warn('find user is empty');
       throw new BaseException(BasicExceptionCode.USERNAME_OR_PASSWORD_IS_ERROR);
     }
-    const cryptoConfig = this.configService.get<Encrypted>('crypto');
+    const cryptoConfig = this.configService.get<Encrypted>('encrypted');
     this.logger.debug(
       '[getUser] cryptoConfig encryptedKey = ',
-      secretMask(cryptoConfig.app.key),
+      secretMask(cryptoConfig.key),
     );
-    const decryptPassword = decrypt(cryptoConfig.app.key, user.password);
+    const decryptPassword = decrypt(cryptoConfig.key, user.password);
     this.logger.debug('[getUser] dePass = %s', secretMask(decryptPassword));
     if (password !== decryptPassword) {
       this.logger.warn("[getUser] user's password is wrong");
@@ -204,10 +207,10 @@ export class AuthModelService implements PasswordModel, RefreshTokenModel {
   ): Promise<string> {
     this.logger.debug(
       'jwt.key.token.access',
-      this.configService.get('crypto.token.access'),
+      this.configService.get('token.access'),
     );
     const accessKey = this.configService.get(
-      'crypto.token.access',
+      'token.access',
     ) as unknown as string;
 
     return sign(

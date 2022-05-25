@@ -1,9 +1,9 @@
-import { LoggerService, BaseException } from '@/common';
 import { Injectable } from '@nestjs/common';
-import { Logger } from 'log4js';
 import { AxiosError } from 'axios';
 import { HttpService } from '@nestjs/axios';
-import { TMDBErrorCode } from '@/constant';
+import { TMDBErrorCode } from '@/constant/tmdb.constant';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
+import { BaseException } from '@/exception/base.exception';
 @Injectable()
 export class MyHttpService {
   private logger: Logger;

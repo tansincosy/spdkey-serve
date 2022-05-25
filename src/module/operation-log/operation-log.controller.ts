@@ -1,4 +1,5 @@
-import { DeleteIdPrams } from '@/common';
+import { AuthGuard } from '@/guard/auth.guard';
+import { BatchDelDTO } from '@/model/delete.model';
 import {
   Body,
   Controller,
@@ -7,7 +8,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '../auth/auth.guard';
 import { OperationLogService } from './operation-log.service';
 import { QueryLogPrams } from './operation-log.type';
 
@@ -23,7 +23,7 @@ export class OperationLogController {
 
   @Delete()
   @UseGuards(AuthGuard)
-  delLog(@Body() delParams: DeleteIdPrams) {
+  delLog(@Body() delParams: BatchDelDTO) {
     return this.operationLogService.deleteLogger(delParams);
   }
 }

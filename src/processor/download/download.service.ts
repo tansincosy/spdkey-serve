@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Logger } from '@/common';
-import { LoggerService } from './log4j.service';
 import { DownloaderHelper } from 'node-downloader-helper';
 import * as dayjs from 'dayjs';
 import { byteHelper } from '@/util';
 import { ensureDirSync } from 'fs-extra';
+import { Logger, LoggerService } from '../log4j/log4j.service';
 
 @Injectable()
 export class DownloadService {
@@ -13,6 +12,14 @@ export class DownloadService {
     this.log = this.logService.getLogger('download');
   }
 
+  /**
+   * 下载文件
+   * @param url
+   * @param filePath
+   * @param dateFile
+   * @param isSkip
+   * @returns
+   */
   downloadFile(
     url: string,
     filePath: string,

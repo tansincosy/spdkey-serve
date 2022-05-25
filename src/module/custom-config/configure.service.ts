@@ -1,10 +1,12 @@
 import { Logger } from 'log4js';
 import { Injectable } from '@nestjs/common';
-import { LoggerService, Pagination, QueryPagination } from '@/common';
 import { ConfigureDao } from './configure.dao';
 import { ConfigDTO, ConfigQueryDTO } from './configure.dto';
 import { Config, ConfigType } from '@prisma/client';
 import { OperationLogService } from '../operation-log/operation-log.service';
+import { Pagination, QueryPagination } from '@/interface/page-info.interface';
+import { LoggerService } from '@/processor/log4j/log4j.service';
+import { BatchDelDTO } from '@/model/delete.model';
 
 @Injectable()
 export class ConfigureService
@@ -44,7 +46,7 @@ export class ConfigureService
   async add(t: ConfigDTO): Promise<{ id: string }> {
     return this.configDao.addConfig(t);
   }
-  async delete(t: { ids: string[] }): Promise<Record<string, any>> {
+  async delete(t: BatchDelDTO): Promise<Record<string, any>> {
     this.configDao.batchDeleteConfig(t);
     return {};
   }

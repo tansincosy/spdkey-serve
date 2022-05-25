@@ -1,23 +1,15 @@
 import { M3UService } from './channel.m3u.service';
-import {
-  QueryChannelSourceDTO,
-  ChannelQueryDTO,
-  QueryChannelDTO,
-} from './channel.dto';
-import {
-  Logger,
-  LoggerService,
-  BaseException,
-  DeleteIdPrams,
-  QueryPagination,
-  Pagination,
-} from '@/common';
+import { QueryChannelSourceDTO, ChannelQueryDTO } from './channel.dto';
 import { Injectable } from '@nestjs/common';
 import { ChannelDAO } from './channel.dao';
-import { BasicExceptionCode } from '@/constant';
 import { moreThOne } from '@/util';
 import { M3U } from './channel.type';
 import { ChannelSource } from '@prisma/client';
+import { Pagination, QueryPagination } from '@/interface/page-info.interface';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
+import { BatchDelDTO } from '@/model/delete.model';
+import { BaseException } from '@/exception/base.exception';
+import { BasicExceptionCode } from '@/constant/error-code.constant';
 
 @Injectable()
 export class ChannelService
@@ -63,7 +55,7 @@ export class ChannelService
     };
   }
 
-  async batchDelete(idObj: DeleteIdPrams) {
+  async batchDelete(idObj: BatchDelDTO) {
     const { ids } = idObj;
     await this.channelDAO.batchDel(ids);
     this.logger.info('batch delete success ids = ', ids);

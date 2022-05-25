@@ -1,9 +1,8 @@
 import { secretMask } from '@/util';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Logger } from 'log4js';
-import { LoggerService } from '../service/log4j.service';
 import { cloneDeep } from 'lodash';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 @Injectable()
 export class HttpRequestMiddleware implements NestMiddleware {
   private log: Logger;

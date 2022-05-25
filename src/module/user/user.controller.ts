@@ -1,4 +1,5 @@
-import { DeleteIdPrams } from '@/common';
+import { AuthGuard } from '@/guard/auth.guard';
+import { BatchDelDTO } from '@/model/delete.model';
 import {
   Body,
   Controller,
@@ -12,7 +13,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthGuard } from '../auth/auth.guard';
 import { RegisterParam, UserQueryParam } from './user.dto';
 import { UserService } from './user.service';
 @Controller('user')
@@ -45,7 +45,7 @@ export class UserController {
   }
 
   @Delete()
-  batchDelUser(@Body() { ids }: DeleteIdPrams) {
+  batchDelUser(@Body() { ids }: BatchDelDTO) {
     return this.userService.batchDelUser(ids);
   }
 }

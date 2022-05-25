@@ -1,4 +1,5 @@
-import { QueryParams } from '@/common';
+import { AuthGuard } from '@/guard/auth.guard';
+import { BatchDelDTO } from '@/model/delete.model';
 import {
   Body,
   Controller,
@@ -10,7 +11,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '../auth/auth.guard';
 import { DeviceDTO, DeviceParams } from './device.dto';
 import { DeviceService } from './device.service';
 
@@ -42,7 +42,7 @@ export class DeviceController {
 
   @Delete()
   @UseGuards(AuthGuard)
-  deleteClient(@Body() { ids }: { ids: string[] }) {
+  deleteClient(@Body() { ids }: BatchDelDTO) {
     return this.deviceService.delete({ ids });
   }
 }

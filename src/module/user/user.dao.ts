@@ -1,7 +1,8 @@
+import { HAS_VALID, UserIsValid, UserLocked } from '@/constant/user.constant';
+import { PrismaService } from '@/processor/database/prisma.service';
+import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { Injectable } from '@nestjs/common';
-import { LoggerService, PrismaService, Logger } from '@/common';
 import { RegisterParam } from './user.dto';
-import { HAS_VALID, UserIsValid, UserLocked } from '@/constant';
 
 @Injectable()
 export class UserDao {
