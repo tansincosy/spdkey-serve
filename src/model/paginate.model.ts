@@ -17,7 +17,7 @@ export class PaginateBaseDTO {
   @IsNotEmpty()
   current?: number;
   @IsNumber()
-  @Max(50)
+  @Max(400)
   @Transform(({ value }) => unknownToNumber(value))
   @IsOptional()
   @IsNotEmpty()

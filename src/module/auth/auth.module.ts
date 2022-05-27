@@ -5,11 +5,12 @@ import { UserService } from '../user/user.service';
 import { AuthModelService } from './auth-model.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AuthOAuthStrategy } from './auth.service.oauth2.strategy';
 
 @Module({
   imports: [DeviceModule, UserModule],
   controllers: [AuthController],
-  providers: [AuthModelService, AuthService, UserService],
+  providers: [AuthModelService, AuthService, UserService, AuthOAuthStrategy],
   exports: [AuthService],
 })
 @Global()
