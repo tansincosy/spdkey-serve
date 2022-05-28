@@ -990,6 +990,14 @@
   dependencies:
     "@types/express" "*"
 
+"@types/oauth2orize@^1.8.10":
+  version "1.8.10"
+  resolved "https://registry.npmmirror.com/@types/oauth2orize/-/oauth2orize-1.8.10.tgz#0f138ef1668e340eb4cb52b660b7f6e8fc4da006"
+  integrity sha512-6MI5FTvKLWlN0/CfXSOyYR/2HK4/HgQcPUBeXOyN6P3E5f4ZOUdeAyzzNdElJapRT/P48Va+FYsxnf/e2QWyug==
+  dependencies:
+    "@types/express" "*"
+    "@types/node" "*"
+
 "@types/oauth@*":
   version "0.9.1"
   resolved "https://registry.npmmirror.com/@types/oauth/-/oauth-0.9.1.tgz#e17221e7f7936b0459ae7d006255dff61adca305"
@@ -2067,7 +2075,7 @@ dayjs@^1.11.1:
   resolved "https://registry.npmmirror.com/dayjs/-/dayjs-1.11.1.tgz#90b33a3dda3417258d48ad2771b415def6545eb0"
   integrity sha512-ER7EjqVAMkRRsxNCC5YqJ9d9VQYuWdGt7aiH2qA5R5wt8ZmWaP2dLUSIK6y/kVzLMlmh1Tvu5xUf4M/wdGJ5KA==
 
-debug@2.6.9:
+debug@2.6.9, debug@2.x.x:
   version "2.6.9"
   resolved "https://registry.npmmirror.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
   integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
@@ -4085,6 +4093,15 @@ oauth2-server@^3.1.1:
     promisify-any "2.0.1"
     statuses "1.5.0"
     type-is "1.6.18"
+
+oauth2orize@^1.11.1:
+  version "1.11.1"
+  resolved "https://registry.npmmirror.com/oauth2orize/-/oauth2orize-1.11.1.tgz#00b6cafe2036a0a3aab0380627dc7cfd5b5e9a9c"
+  integrity sha512-9dSx/Gwm0J2Rvj4RH9+h7iXVnRXZ6biwWRgb2dCeQhCosODS0nYdM9I/G7BUGsjbgn0pHjGcn1zcCRtzj2SlRA==
+  dependencies:
+    debug "2.x.x"
+    uid2 "0.0.x"
+    utils-merge "1.x.x"
 
 oauth@0.9.x:
   version "0.9.15"
