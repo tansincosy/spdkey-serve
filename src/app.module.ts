@@ -17,6 +17,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigureModule } from './module/custom-config/configure.module';
 import { LoggingInterceptor } from './interceptor/logger.interceptor';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { HttpModule } from '@nestjs/axios';
 
 const cacheRedisStore = () => {
   if (process.env.CACHE_STORE_HOST && process.env.CACHE_STORE_PORT) {
@@ -33,6 +34,9 @@ const cacheRedisStore = () => {
 };
 @Module({
   imports: [
+    HttpModule.register({
+      timeout: 5000,
+    }),
     DataBaseModule,
     LoggerModule,
     UserModule,

@@ -6,12 +6,14 @@ import { getConfig } from './processor/config/log4js.config';
 import { LoggerService } from './processor/log4j/log4j.service';
 import { Log } from './util';
 import helmet from 'helmet';
+import { oauth2Proxy } from './middleware/proxy.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new Log(getConfig()),
   });
   app.use(helmet());
+  app.use('/oauth2', oauth2Proxy);
   app.useGlobalFilters(new AllExceptionFilter(app.get(LoggerService)));
   app.useGlobalPipes(
     new ValidationPipe({

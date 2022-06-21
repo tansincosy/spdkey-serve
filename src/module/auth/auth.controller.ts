@@ -1,3 +1,4 @@
+import { HttpService } from '@nestjs/axios';
 import {
   Body,
   Controller,
@@ -13,26 +14,15 @@ import * as OAuth2 from 'oauth2-server';
 import { CheckCode, ModifyParam } from '../user/user.dto';
 import { AuthModelService } from './auth-model.service';
 import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 @Controller('oauth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly authModelService: AuthModelService,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
   ) {}
-
-  /**
-   * 登录
-   * @param req
-   * @param resp
-   */
-  @Post('token')
-  async getToken(@Req() req: Request, @Res() resp: Response) {
-    const token = await this.authService.getToken(
-      new OAuth2.Request(req),
-      new OAuth2.Response(resp),
-    );
-    resp.status(HttpStatus.OK).json(token);
-  }
 
   /**
    * 注销

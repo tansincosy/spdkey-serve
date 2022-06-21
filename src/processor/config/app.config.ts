@@ -39,4 +39,7 @@ export const AppConfigLoader = () => ({
     programXMLPath: `${dataDir}/channel/program`,
     allowChannelPath: `${dataDir}/channel/_tmp`,
   },
+  oauthServer: {
+    url: '' || process.env.OAUTH_SERVER_URL,
+  },
 });
