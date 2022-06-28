@@ -7,15 +7,15 @@ export class DeviceDTO {
   @IsNumber()
   isLocked?: number;
   @IsString()
-  readonly deviceId: string;
+  deviceId: string;
   @IsString()
-  readonly os: string;
+  os: string;
   @IsString()
-  readonly name: string;
+  name: string;
   @IsString()
-  readonly type: string;
+  type: string;
   @IsString()
-  readonly engine: string;
+  engine: string;
   deviceSecret?: string;
   grants?: string[];
   @IsNumber()
@@ -27,7 +27,7 @@ export class DeviceDTO {
 
 export class DeviceParams extends PaginateBaseDTO {
   @IsString()
-  readonly name: string;
+  name: string;
   @IsNumber()
   isOnline?: number;
   @IsNumber()

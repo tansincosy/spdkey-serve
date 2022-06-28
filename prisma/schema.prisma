@@ -10,99 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// scope 表
-model Scope {
-  id        String        @id @default(cuid())
-  updatedAt DateTime      @default(now()) @map("updated_at")
-  createdAt DateTime      @default(now()) @map("created_at")
-  name      String?
-  users     ScopeOnUser[]
-
-  @@map("zap_tb_scope")
-}
-
-model ScopeOnUser {
-  createdAt DateTime @default(now()) @map("created_at")
-  scope     Scope?   @relation(fields: [scopeId], references: [id])
-  scopeId   String   @map("scope_id")
-  user      User?    @relation(fields: [userId], references: [id])
-  userId    String   @map("user_id")
-
-  @@id([scopeId, userId])
-  @@map("zap_link_scope_on_user")
-}
-
-//用户表
-model User {
-  id          String         @id @default(cuid())
-  updatedAt   DateTime       @default(now()) @map("updated_at")
-  createdAt   DateTime       @default(now()) @map("created_at")
-  username    String?        @unique @default("")
-  password    String?        @default("")
-  email       String?        @unique @default("")
-  emailCode   String?        @map("email_code") @db.Text
-  isLocked    Int?           @default(1) @map("is_locked")
-  isValid     Int            @default(1) @map("is_valid")
-  scopes      ScopeOnUser[]
-  devices     UserOnDevice[]
-  deviceLimit Int?           @default(5) @map("device_limit")
-
-  @@map("zap_tb_user")
-}
-
-model UserOnDevice {
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
-  userId    String   @map("user_id")
-  deviceId  String   @map("device_id")
-
-  User   User   @relation(fields: [userId], references: [id])
-  Device Device @relation(fields: [deviceId], references: [id])
-  @@id([userId, deviceId])
-  @@map("zap_link_user_on_device")
-}
-
-model Grant {
-  id        String          @id @default(cuid())
-  updatedAt DateTime        @default(now()) @map("updated_at")
-  createdAt DateTime        @default(now()) @map("created_at")
-  name      String?         @unique @default("")
-  device    GrantOnDevice[]
-
-  @@map("zap_tb_grant")
-}
-
-model GrantOnDevice {
-  createdAt DateTime @default(now()) @map("created_at")
-  grant     Grant?   @relation(fields: [grantId], references: [id])
-  grantId   String   @map("grant_id")
-  device    Device?  @relation(fields: [deviceId], references: [id])
-  deviceId  String   @map("device_id")
-
-  @@id([grantId, deviceId])
-  @@map("zap_link_grant_on_device")
-}
-
-model Device {
-  id                          String          @id @default(cuid())
-  updatedAt                   DateTime        @default(now()) @map("updated_at")
-  createdAt                   DateTime        @default(now()) @map("created_at")
-  name                        String?         @default("")
-  type                        String?         @default("")
-  engine                      String?         @default("")
-  os                          String?         @default("")
-  deviceId                    String?         @unique @default("") @map("device_id")
-  deviceSecret                String?         @default("") @map("device_secret")
-  isLocked                    Int?            @default(1) @map("is_locked")
-  accessTokenValidateSeconds  Int             @default(1800) @map("access_token_validate_seconds")
-  refreshTokenValidateSeconds Int             @default(604800) @map("refresh_token_validate_seconds")
-  users                       UserOnDevice[]
-  isOnline                    Int?            @default(1) @map("is_online") @db.TinyInt
-  grants                      GrantOnDevice[]
-
-  @@map("zap_tb_device")
-}
-
 model Config {
   id        String   @id @default(cuid())
   name      String   @unique @default("")
@@ -114,7 +21,7 @@ model Config {
   ConfigType   ConfigType? @relation(fields: [configTypeId], references: [id])
   configTypeId String?     @map("type_id")
 
-  @@map("zap_tb_config")
+  @@map("dva_config")
 }
 
 model ConfigType {
@@ -122,7 +29,7 @@ model ConfigType {
   name    String   @unique @default("")
   configs Config[]
 
-  @@map("zap_tb_config_type")
+  @@map("dva_config_type")
 }
 
 model Channel {
@@ -135,7 +42,7 @@ model Channel {
   playUrl   PlayUrl[]
   programs  Program[]
 
-  @@map("zap_tb_channel")
+  @@map("dva_channel")
 }
 
 model PlayUrl {
@@ -147,7 +54,7 @@ model PlayUrl {
   Channel   Channel? @relation(fields: [channelId], references: [id])
   channelId String?  @map("channel_id")
 
-  @@map("zap_tb_playurl")
+  @@map("dva_playurl")
 }
 
 model Program {
@@ -160,7 +67,7 @@ model Program {
 
   Channel   Channel? @relation(fields: [channelId], references: [id])
   channelId String?  @map("channel_id")
-  @@map("zap_tb_program")
+  @@map("dva_program")
 }
 
 model M3U {
@@ -172,7 +79,7 @@ model M3U {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
 
-  @@map("zap_tb_m3u")
+  @@map("dva_m3u")
 }
 
 model ChannelSource {
@@ -190,7 +97,7 @@ model ChannelSource {
 
   M3U   M3U?    @relation(fields: [m3UId], references: [id])
   m3UId String? @map("m3u_Id")
-  @@map("zap_tb_channel_source")
+  @@map("dva_channel_source")
 }
 
 model EPGUrl {
@@ -203,7 +110,7 @@ model EPGUrl {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
 
-  @@map("zap_tb_program_url")
+  @@map("dva_program_url")
 }
 
 model EPGSourceChannel {
@@ -218,7 +125,7 @@ model EPGSourceChannel {
 
   EPGUrl   EPGUrl? @relation(fields: [ePGUrlId], references: [id])
   ePGUrlId String? @map("epg_url_id")
-  @@map("zap_tb_program_channel")
+  @@map("dva_program_channel")
 }
 
 model OperationLog {
@@ -229,5 +136,5 @@ model OperationLog {
   user    String @default("")
 
   createdAt DateTime @default(now()) @map("created_at")
-  @@map("zap_tb_operation_log")
+  @@map("dva_operation_log")
 }

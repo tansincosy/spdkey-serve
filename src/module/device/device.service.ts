@@ -1,9 +1,9 @@
 import { Pagination } from '@/interface/page-info.interface';
 import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { Injectable } from '@nestjs/common';
-import { Device } from '@prisma/client';
 import { DeviceDao } from './device.dao';
 import { DeviceDTO, DeviceParams } from './device.dto';
+import { OAuthClientDetails } from '@dva_oauth/prisma/client';
 
 @Injectable()
 export class DeviceService {
@@ -15,7 +15,9 @@ export class DeviceService {
     this.logger = this.loggerService.getLogger(DeviceService.name);
   }
 
-  pageList(query: DeviceParams): Promise<Pagination<Partial<Device>[]>> {
+  pageList(
+    query: DeviceParams,
+  ): Promise<Pagination<Partial<OAuthClientDetails>[]>> {
     this.logger.info('[get]::: enter');
     return this.deviceDao.pageList(query);
   }
@@ -27,7 +29,7 @@ export class DeviceService {
   async saveDevice(device: DeviceDTO) {
     this.logger.info('[saveDevice] enter');
 
-    const { deviceSecret, id } = await this.deviceDao.saveDevice({
+    const { id } = await this.deviceDao.saveDevice({
       name: device.name,
       deviceId: device.deviceId,
       os: device.os,
@@ -44,7 +46,7 @@ export class DeviceService {
 
     await this.deviceDao.saveGrantOnDevice(id, ...grantIds);
 
-    return { deviceSecret, id };
+    return { id };
   }
 
   async updateDevice(device: DeviceDTO) {

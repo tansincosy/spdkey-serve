@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@dva_oauth/prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_OAUTH")
+}
+
+// oauth2 table list
+model OAuthClientDetails {
+  id                    String @id @default(cuid()) @map("client_id")
+  resourceIds           String @default("") @map("resource_ids")
+  clientSecret          String @default("") @map("client_secret")
+  //客户端申请的权限范围,可选值包括read,write,trust;若有多个权限范围用逗号(,)分隔
+  scope                 String @default("") @map("scope")
+  authorizedGrantTypes  String @default("") @map("authorized_grant_types")
+  webServerRedirectUri  String @default("") @map("web_server_redirect_uri")
+  //客户端所拥有的Spring Security的权限值,可选, 若有多个权限值,用逗号(,)分隔
+  authorities           String @default("") @map("authorities")
+  accessTokenValidity   Int    @default(1800) @map("access_token_validity")
+  refreshTokenValidity  Int    @default(604800) @map("refresh_token_validity")
+  //这是一个预留的字段,在Oauth的流程中没有实际的使用,可选,但若设置值,必须是JSON格式的数据
+  additionalInformation String @default("") @map("additional_information")
+  isLocked              Int    @default(0) @map("is_locked")
+
+  //设置用户是否自动Approval操作, 默认值为 'false', 可选值包括 'true','false', 'read','write'.
+  //该字段只适用于grant_type="authorization_code"的情况,当用户登录成功后,若该值为'true'或支持的scope值,则会跳过用户Approve的页面, 直接授权.
+  //该字段与 trusted 有类似的功能, 是 spring-security-oauth2 的 2.0 版本后添加的新属性.
+  autoApprove String   @default("") @map("auto_approve")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  OAuthToken OAuthToken[]
+
+  oAuthTerminals OAuthTerminal[]
+
+  OAuthApprovals OAuthApprovals[]
+  @@map("oauth_client_details")
+}
+
+model OAuthTerminal {
+  id                   String              @id @default(cuid())
+  isLocked             Int?                @default(0) @map("is_locked") @db.TinyInt
+  name                 String?             @default("")
+  type                 String?             @default("")
+  engine               String?             @default("")
+  os                   String?             @default("")
+  isOnline             Int?                @default(0) @map("is_online") @db.TinyInt
+  OAuthClientDetails   OAuthClientDetails? @relation(fields: [oAuthClientDetailsId], references: [id])
+  oAuthClientDetailsId String?             @map("oAuth_client_details_Id")
+  users                UserOnTerminal[]
+
+  @@map("oauth_terminal")
+}
+
+model OAuthToken {
+  id String @id @default(cuid())
+
+  //Token标识：通过MD5加密access_token的值
+  tokenId          String @map("token_id") @db.LongText
+  //OAuth2AccessToken.java对象序列化内容
+  token            String @map("token") @db.LongText
+  // 用户名，若客户端没有用户名则该值等于client_id
+  username         String @default("")
+  authenticationId String @map("authentication_id") @db.LongText //根据当前的username、client_id与scope通过MD5加密生成该字段的值
+  authentication   String @map("authentication") @db.LongText //OAuth2Authentication.java对象序列化内容
+
+  //RefreshToken标识：通过MD5加密refresh_token的值
+  refreshToken String @map("refresh_token") @db.LongText
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  OAuthClientDetails OAuthClientDetails? @relation(fields: [clientId], references: [id])
+
+  //认证授权客户端ID
+  clientId String @default("") @map("client_id")
+  @@map("oauth_token")
+}
+
+model OAuthApprovals {
+  id        String   @id @default(cuid())
+  userId    String   @default("") @map("user_id")
+  clientId  String   @default("") @map("client_id")
+  scope     String   @default("") @map("scope")
+  status    String   @default("") @map("status")
+  code      String   @unique @default("") @map("code")
+  expiresAt DateTime @default(now()) @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  OAuthClientDetails OAuthClientDetails? @relation(fields: [clientId], references: [id])
+  @@map("oauth_approvals")
+}
+
+model clientDetails {
+  id                    String   @id @default(cuid())
+  appId                 String   @default(uuid())
+  cliendId              String   @default("") @map("client_id")
+  resourceIds           String   @default("") @map("resource_ids")
+  appSecret             String   @default("") @map("app_secret")
+  scope                 String   @default("") @map("scope")
+  grantTypes            String   @default("") @map("grant_types")
+  redirectUrl           String   @default("") @map("redirect_url")
+  authorities           String   @default("") @map("authorities")
+  accessTokenValidity   Int      @default(1800) @map("access_token_validity")
+  refreshTokenValidity  Int      @default(604800) @map("refresh_token_validity")
+  additionalInformation String   @default("") @map("additional_information")
+  autoApproveScope      String   @default("") @map("auto_approve_scope")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @default(now()) @map("updated_at")
+
+  @@map("oauth_custom_client_details")
+}
+
+model User {
+  id        String           @id @default(cuid())
+  username  String           @unique @default("") @map("username")
+  password  String           @default("") @map("password")
+  enable    Int              @default(1) @map("enable")
+  updatedAt DateTime         @default(now()) @map("updated_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+  isLocked  Int?             @default(0) @map("is_locked")
+  email     String?          @unique @default("")
+  terminals UserOnTerminal[]
+  emailCode String?          @map("email_code") @db.Text
+
+  @@map("oauth_user")
+}
+
+model UserOnTerminal {
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+  userId     String   @map("user_id")
+  terminalId String   @map("terminal_id")
+
+  User          User          @relation(fields: [userId], references: [id])
+  OAuthTerminal OAuthTerminal @relation(fields: [terminalId], references: [id])
+
+  @@id([userId, terminalId])
+  @@map("oauth_link_user_on_terminal")
+}

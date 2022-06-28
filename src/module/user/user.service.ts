@@ -1,3 +1,4 @@
+import { PrismaOauthService } from '@/processor/database/prisma.service.oauth';
 import { isEmpty } from 'lodash';
 import { CACHE_MANAGER, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
@@ -15,15 +16,13 @@ import {
 } from '@/util';
 import { Request, Response } from 'express';
 import { Cache } from 'cache-manager';
-import { Token } from 'oauth2-server';
 import { format } from 'util';
 import { UserDao } from './user.dao';
 import { RegisterParam, UserQueryParam } from './user.dto';
 
-import { User } from '@prisma/client';
+import { User } from '@dva_oauth/prisma/client';
 import { Pagination, QueryPagination } from '@/interface/page-info.interface';
 import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
-import { PrismaService } from '@/processor/database/prisma.service';
 import { BaseException } from '@/exception/base.exception';
 import {
   BasicExceptionCode,
@@ -39,7 +38,7 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
     private readonly loggerService: LoggerService,
     private readonly userDao: UserDao,
     private readonly configService: ConfigService,
-    private readonly prismaService: PrismaService,
+    private readonly prismaService: PrismaOauthService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {
@@ -210,7 +209,7 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
     this.log.info('[getCurrentUser] token = %s', token);
     if (token) {
       const [, tokenStr] = token.split(' ');
-      const getAccessTokenValue = await this.cacheManager.get<Token>(
+      const getAccessTokenValue = await this.cacheManager.get<any>(
         format(TOKEN_FORMAT.token, tokenStr),
       );
       if (getAccessTokenValue) {
@@ -253,8 +252,7 @@ export class UserService implements QueryPagination<UserQueryParam, User> {
           email: true,
           createdAt: true,
           isLocked: true,
-          isValid: true,
-          deviceLimit: true,
+          enable: true,
         },
       }),
     ]);

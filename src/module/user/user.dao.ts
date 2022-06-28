@@ -1,5 +1,5 @@
-import { HAS_VALID, UserIsValid, UserLocked } from '@/constant/user.constant';
-import { PrismaService } from '@/processor/database/prisma.service';
+import { PrismaOauthService } from '@/processor/database/prisma.service.oauth';
+import { HAS_VALID, UserIsValid } from '@/constant/user.constant';
 import { Logger, LoggerService } from '@/processor/log4j/log4j.service';
 import { Injectable } from '@nestjs/common';
 import { RegisterParam } from './user.dto';
@@ -8,7 +8,7 @@ import { RegisterParam } from './user.dto';
 export class UserDao {
   private logger: Logger;
   constructor(
-    private readonly prismaService: PrismaService,
+    private readonly prismaService: PrismaOauthService,
     private log4js: LoggerService,
   ) {
     this.logger = this.log4js.getLogger(UserDao.name);
@@ -19,13 +19,6 @@ export class UserDao {
     const user = await this.prismaService.user.findFirst({
       where: {
         username,
-      },
-      include: {
-        scopes: {
-          include: {
-            scope: true,
-          },
-        },
       },
     });
     return user;
@@ -42,17 +35,6 @@ export class UserDao {
         password: userParam.password,
         email: userParam.email,
         emailCode,
-        isValid: UserIsValid.NOT_ALLOW,
-        isLocked: UserLocked.UN_LOCK,
-        scopes: {
-          create: {
-            scope: {
-              create: {
-                name: 'web',
-              },
-            },
-          },
-        },
       },
       select: {
         id: true,
@@ -65,7 +47,7 @@ export class UserDao {
     this.logger.info('[updateUserValidStatus] updateUserValidStatus');
     return await this.prismaService.user.update({
       data: {
-        isValid: UserIsValid.ALLOW,
+        enable: UserIsValid.NOT_ALLOW,
         emailCode: HAS_VALID,
       },
       where: {
@@ -146,49 +128,36 @@ export class UserDao {
         username: true,
         email: true,
         isLocked: true,
-        isValid: true,
+        enable: true,
         updatedAt: true,
         createdAt: true,
-        scopes: {
-          select: {
-            scope: {
+        terminals: {
+          include: {
+            OAuthTerminal: {
               select: {
                 id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        devices: {
-          select: {
-            Device: {
-              select: {
-                name: true,
-                isOnline: true,
-                isLocked: true,
-                id: true,
+                os: true,
                 type: true,
+                name: true,
+                isLocked: true,
+                isOnline: true,
               },
             },
           },
         },
-        deviceLimit: true,
       },
     });
 
     return {
       ...userDetail,
-      devices: userDetail.devices.map((item) => {
+      devices: userDetail.terminals.map((item) => {
         return {
-          name: item.Device.name,
-          isOnline: item.Device.isOnline,
-          isLocked: item.Device.isLocked,
-          type: item.Device.type,
-          id: item.Device.id,
+          name: item.OAuthTerminal.name,
+          isOnline: item.OAuthTerminal.isOnline,
+          isLocked: item.OAuthTerminal.isLocked,
+          type: item.OAuthTerminal.type,
+          id: item.OAuthTerminal.id,
         };
-      }),
-      scopes: userDetail.scopes.map((item) => {
-        return item.scope.name;
       }),
     };
   }
@@ -202,7 +171,8 @@ export class UserDao {
         },
       },
     });
-    const delUserOnDevice = this.prismaService.userOnDevice.deleteMany({
+
+    const delUserOnDevice = this.prismaService.userOnTerminal.deleteMany({
       where: {
         userId: {
           in: ids,
@@ -210,19 +180,7 @@ export class UserDao {
       },
     });
 
-    const delUserOnScope = this.prismaService.scopeOnUser.deleteMany({
-      where: {
-        userId: {
-          in: ids,
-        },
-      },
-    });
-
-    await this.prismaService.$transaction([
-      delUserOnDevice,
-      delUserOnScope,
-      delUser,
-    ]);
+    await this.prismaService.$transaction([delUserOnDevice, delUser]);
     this.logger.info('batchDelUser success');
     return {};
   }

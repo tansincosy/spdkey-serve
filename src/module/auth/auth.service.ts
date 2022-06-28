@@ -1,7 +1,5 @@
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
-import * as OAuth2 from 'oauth2-server';
-import { AuthModelService } from './auth-model.service';
 import { atob, btoa, encrypt, encryptedWithPbkdf2, joinKey } from '@/util';
 import { UserDao } from '../user/user.dao';
 import { CheckCode, ModifyParam } from '../user/user.dto';
@@ -17,33 +15,11 @@ import { Encrypted } from '@/interface/app-config.interface';
 export class AuthService {
   private logger: Logger;
   constructor(
-    private readonly modelService: AuthModelService,
     private readonly userDao: UserDao,
     private readonly log4js: LoggerService,
     private readonly configService: ConfigService,
   ) {
     this.logger = this.log4js.getLogger(AuthService.name);
-  }
-
-  getOAuthClient() {
-    return new OAuth2({
-      model: this.modelService,
-    });
-  }
-  /**
-   * token 登录
-   * @param request
-   * @param response
-   * @returns
-   */
-  async getToken(request: OAuth2.Request, response: OAuth2.Response) {
-    const resultToken = await this.getOAuthClient().token(request, response);
-    return {
-      accessToken: resultToken.accessToken,
-      refreshToken: resultToken.refreshToken,
-      expiredIn: resultToken.client.accessTokenLifetime,
-      type: 'Bearer',
-    };
   }
 
   async checkMail(checkCode: string): Promise<{ id: string }> {

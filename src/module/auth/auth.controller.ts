@@ -1,39 +1,10 @@
-import { HttpService } from '@nestjs/axios';
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import * as OAuth2 from 'oauth2-server';
+import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { CheckCode, ModifyParam } from '../user/user.dto';
-import { AuthModelService } from './auth-model.service';
 import { AuthService } from './auth.service';
-import { ConfigService } from '@nestjs/config';
 @Controller('oauth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly authModelService: AuthModelService,
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
-  /**
-   * 注销
-   * @param req
-   * @param resp
-   */
-  @Post('revoke')
-  async removeToken(@Req() req: Request, @Res() resp: Response) {
-    await this.authModelService.revokeTokenForLogin(req);
-    resp.status(HttpStatus.OK).json({});
-  }
   /**
    * 邮箱跳转地址
    */
